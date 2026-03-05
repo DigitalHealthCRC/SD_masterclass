@@ -1149,5 +1149,378 @@ gsap.to('.photo-break img', {
   y: 60, ease: 'none',
 });
 </script>
+
+<!-- ═══ LIVING-TABLE TESTIMONIAL BACKGROUND ══════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  // Only run once Three.js is available
+  if (typeof THREE === 'undefined') return;
+
+  // ── Data ──────────────────────────────────────────────────────────────────
+  const COLS  = ['Patient ID', 'Diagnosis', 'Age', 'Medication'];
+  const REAL  = [
+    ['PT-8821', 'J45.0 Asthma', '67 y/o', 'Salbutamol 2.5mg'],
+    ['PT-3341', 'E11.9 T2DM',   '54 y/o', 'Metformin 500mg'],
+    ['PT-7712', 'I10 Hypertn.', '71 y/o', 'Amlodipine 5mg'],
+    ['PT-2209', 'C34.1 LungCA', '63 y/o', 'Carboplatin IV'],
+  ];
+  const SYNTH = [
+    ['SYN-0041', 'J45.1 Asthma', '65 y/o', 'Fluticasone 125mcg'],
+    ['SYN-0087', 'E11.3 T2DM',   '52 y/o', 'Insulin Glargine'],
+    ['SYN-0153', 'I11 Hypertn.', '69 y/o', 'Lisinopril 10mg'],
+    ['SYN-0271', 'C34.2 LungCA', '61 y/o', 'Pembrolizumab IV'],
+  ];
+
+  // ── Renderer scoped to #testimonial-canvas ────────────────────────────────
+  const canvas   = document.getElementById('testimonial-canvas');
+  const section  = document.getElementById('testimonial');
+  if (!canvas || !section) return;
+
+  function getSize() {
+    return { w: section.offsetWidth, h: section.offsetHeight };
+  }
+  let { w, h } = getSize();
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h);
+  renderer.setClearColor(0x020b16, 1);
+
+  const scene  = new THREE.Scene();
+  scene.fog    = new THREE.FogExp2(0x020b16, 0.022);
+
+  const camera = new THREE.PerspectiveCamera(58, w / h, 0.1, 100);
+  camera.position.set(0, 0.6, 9.5);
+
+  // ── Cell texture factory ──────────────────────────────────────────────────
+  function cellTex(colName, value, isSynth, isHdr) {
+    const W = 330, H = 76;
+    const cv  = document.createElement('canvas');
+    cv.width  = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+    const [r, g, b] = isSynth ? [0, 229, 255] : [255, 144, 64];
+    const bgAlpha   = isHdr ? 0.28 : 0.09;
+
+    ctx.fillStyle = `rgba(${r},${g},${b},${bgAlpha})`;
+    ctx.fillRect(0, 0, W, H);
+
+    const topGrad = ctx.createLinearGradient(0, 0, W, 0);
+    topGrad.addColorStop(0,    `rgba(${r},${g},${b},0)`);
+    topGrad.addColorStop(0.25, `rgba(${r},${g},${b},0.9)`);
+    topGrad.addColorStop(0.75, `rgba(${r},${g},${b},0.9)`);
+    topGrad.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, W, 2);
+
+    ctx.fillStyle = `rgba(${r},${g},${b},0.18)`;
+    ctx.fillRect(0,   0, 1, H);
+    ctx.fillRect(W-1, 0, 1, H);
+    ctx.fillRect(0, H-1, W, 1);
+
+    if (isHdr) {
+      ctx.font         = 'bold 12px "Courier New"';
+      ctx.fillStyle    = `rgba(${r},${g},${b},0.95)`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(colName.toUpperCase(), W / 2, H / 2);
+    } else {
+      ctx.font         = '9px "Courier New"';
+      ctx.fillStyle    = `rgba(${r},${g},${b},0.48)`;
+      ctx.textAlign    = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(colName.toUpperCase(), 10, 10);
+      ctx.font         = '13px "Courier New"';
+      ctx.fillStyle    = '#e8f4ff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(value, 10, H * 0.64);
+    }
+    return new THREE.CanvasTexture(cv);
+  }
+
+  // ── Table geometry ────────────────────────────────────────────────────────
+  const CW = 1.58, CH = 0.49, GAP = 0.07;
+  const ROW_H   = 0.57;
+  const N_ROWS  = REAL.length;
+  const TOTAL_W = COLS.length * (CW + GAP) - GAP;
+
+  function rowY(ri) { return (N_ROWS / 2 - ri - 0.5) * ROW_H; }
+  const HDR_Y = rowY(0) + ROW_H * 0.95;
+
+  function makeTable(data, isSynth, xPos, rotY) {
+    const group     = new THREE.Group();
+    group.position.x = xPos;
+    group.rotation.y = rotY;
+    const rowGroups = [];
+
+    // Header
+    const hdrG = new THREE.Group();
+    hdrG.position.y = HDR_Y;
+    COLS.forEach((col, ci) => {
+      const mat  = new THREE.MeshBasicMaterial({
+        map: cellTex(col, '', isSynth, true),
+        transparent: true, opacity: 0.92,
+        side: THREE.DoubleSide, depthWrite: false,
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(CW, CH * 0.75), mat);
+      mesh.position.x = ci * (CW + GAP) - TOTAL_W / 2 + CW / 2;
+      hdrG.add(mesh);
+    });
+    group.add(hdrG);
+
+    // Data rows
+    data.forEach((row, ri) => {
+      const rg = new THREE.Group();
+      rg.position.y      = rowY(ri);
+      rg.userData.baseY  = rowY(ri);
+      rg.userData.phase  = ri * 1.37 + Math.random() * 0.4;
+      COLS.forEach((col, ci) => {
+        const mat  = new THREE.MeshBasicMaterial({
+          map: cellTex(col, row[ci], isSynth, false),
+          transparent: true, opacity: 0.82,
+          side: THREE.DoubleSide, depthWrite: false,
+        });
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(CW, CH), mat);
+        mesh.position.x = ci * (CW + GAP) - TOTAL_W / 2 + CW / 2;
+        rg.add(mesh);
+      });
+      group.add(rg);
+      rowGroups.push(rg);
+    });
+    return { group, rowGroups };
+  }
+
+  const TABLE_X = 4.2;
+  const { group: realGroup,  rowGroups: realRows  } = makeTable(REAL,  false, -TABLE_X,  0.24);
+  const { group: synthGroup, rowGroups: synthRows } = makeTable(SYNTH, true,   TABLE_X, -0.24);
+  scene.add(realGroup);
+  scene.add(synthGroup);
+
+  // ── GAN beam curves ───────────────────────────────────────────────────────
+  const BEAM_SX = -TABLE_X + TOTAL_W / 2 + 0.08;
+  const BEAM_EX =  TABLE_X - TOTAL_W / 2 - 0.08;
+
+  function makeCurve(ri) {
+    const sy = rowY(ri);
+    return new THREE.CatmullRomCurve3([
+      new THREE.Vector3(BEAM_SX,        sy,       0),
+      new THREE.Vector3(BEAM_SX * 0.45, sy + 0.18, 1.8),
+      new THREE.Vector3(0,              sy + 0.30, 2.8),
+      new THREE.Vector3(BEAM_EX * 0.45, sy + 0.18, 1.8),
+      new THREE.Vector3(BEAM_EX,        sy,       0),
+    ]);
+  }
+  const curves = REAL.map((_, ri) => makeCurve(ri));
+
+  const beamLines = curves.map((curve) => {
+    const pts = curve.getPoints(80);
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({
+      color: new THREE.Color(0x00ff99),
+      transparent: true, opacity: 0.1,
+      blending: THREE.AdditiveBlending,
+    });
+    const line = new THREE.Line(geo, mat);
+    scene.add(line);
+    return line;
+  });
+
+  // ── Data packets ──────────────────────────────────────────────────────────
+  const PER_BEAM = 6;
+  const packets  = [];
+  curves.forEach((curve, bi) => {
+    for (let pi = 0; pi < PER_BEAM; pi++) {
+      const geo  = new THREE.SphereGeometry(0.065, 7, 7);
+      const mat  = new THREE.MeshBasicMaterial({
+        color: 0x00ffaa, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.userData.bi  = bi;
+      mesh.userData.t   = pi / PER_BEAM;
+      mesh.userData.spd = 0.12 + Math.random() * 0.06;
+      scene.add(mesh);
+      packets.push(mesh);
+    }
+  });
+
+  // ── Centre glow rings ─────────────────────────────────────────────────────
+  const ringDefs = [
+    { r: 0.7,  col: 0x00e5ff, op: 0.12, spd:  0.004 },
+    { r: 1.35, col: 0x7c3aed, op: 0.09, spd: -0.003 },
+    { r: 2.1,  col: 0x00ffaa, op: 0.07, spd:  0.002 },
+    { r: 3.1,  col: 0xff9040, op: 0.05, spd: -0.0015 },
+  ];
+  const rings = ringDefs.map(({ r, col, op, spd }) => {
+    const pts = [];
+    for (let i = 0; i <= 96; i++) {
+      const a = (i / 96) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0));
+    }
+    const geo  = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat  = new THREE.LineBasicMaterial({
+      color: col, transparent: true, opacity: op,
+      blending: THREE.AdditiveBlending,
+    });
+    const line = new THREE.Line(geo, mat);
+    line.position.z  = 1.0;
+    line.userData.spd = spd;
+    scene.add(line);
+    return line;
+  });
+
+  // ── Ambient particles ─────────────────────────────────────────────────────
+  function makeParticles(n, col, spread, sz, opac) {
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      pos[i*3]   = (Math.random() - 0.5) * spread;
+      pos[i*3+1] = (Math.random() - 0.5) * spread * 0.55;
+      pos[i*3+2] = (Math.random() - 0.5) * spread * 0.4;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({
+      color: col, size: sz,
+      transparent: true, opacity: opac,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    return new THREE.Points(geo, mat);
+  }
+  function mkVel(n, scale) {
+    const v = new Float32Array(n * 3);
+    for (let i = 0; i < n * 3; i++) v[i] = (Math.random() - 0.5) * scale;
+    return v;
+  }
+  const ambReal  = makeParticles(500, 0xff6020, 24, 0.035, 0.35);
+  const ambSynth = makeParticles(700, 0x00e5ff, 24, 0.03,  0.40);
+  const ambMid   = makeParticles(300, 0x00ffaa, 10, 0.025, 0.30);
+  ambReal.userData.vel  = mkVel(500, 0.004);
+  ambSynth.userData.vel = mkVel(700, 0.003);
+  ambMid.userData.vel   = mkVel(300, 0.005);
+  scene.add(ambReal); scene.add(ambSynth); scene.add(ambMid);
+
+  // ── Background grid ───────────────────────────────────────────────────────
+  const gridG   = new THREE.Group();
+  const gridMat = new THREE.LineBasicMaterial({ color: 0x071528, transparent: true, opacity: 0.7 });
+  const GSIZ = 15, GSTEP = 1.6;
+  for (let x = -GSIZ; x <= GSIZ; x += GSTEP) {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x, -9, -7), new THREE.Vector3(x, 9, -7)
+    ]);
+    gridG.add(new THREE.Line(geo, gridMat));
+  }
+  for (let y = -9; y <= 9; y += GSTEP) {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-GSIZ, y, -7), new THREE.Vector3(GSIZ, y, -7)
+    ]);
+    gridG.add(new THREE.Line(geo, gridMat));
+  }
+  scene.add(gridG);
+
+  // ── Particle drift helper ─────────────────────────────────────────────────
+  function animateParticleCloud(pts, spread) {
+    const pos = pts.geometry.attributes.position.array;
+    const vel = pts.userData.vel;
+    const n   = pos.length / 3;
+    for (let i = 0; i < n; i++) {
+      pos[i*3]   += vel[i*3];
+      pos[i*3+1] += vel[i*3+1];
+      pos[i*3+2] += vel[i*3+2];
+      for (let ax = 0; ax < 3; ax++) {
+        const lim = ax === 1 ? spread * 0.275 : (ax === 2 ? spread * 0.2 : spread * 0.5);
+        if (Math.abs(pos[i*3+ax]) > lim) vel[i*3+ax] *= -1;
+      }
+    }
+    pts.geometry.attributes.position.needsUpdate = true;
+  }
+
+  // ── Animation loop ────────────────────────────────────────────────────────
+  const clock = new THREE.Clock();
+  let elapsed = 0;
+  let rafId   = null;
+  let running = false;
+
+  function animate() {
+    rafId   = requestAnimationFrame(animate);
+    const dt = clock.getDelta();
+    elapsed += dt;
+
+    // Row bobbing
+    [realRows, synthRows].forEach(rows => {
+      rows.forEach(rg => {
+        const ph = rg.userData.phase;
+        rg.position.y = rg.userData.baseY + Math.sin(elapsed * 0.48 + ph) * 0.042;
+        const op = 0.62 + Math.sin(elapsed * 0.75 + ph) * 0.22;
+        rg.children.forEach(m => { if (m.material) m.material.opacity = op; });
+      });
+    });
+
+    // Table sway
+    realGroup.rotation.y  =  0.24 + Math.sin(elapsed * 0.14) * 0.025;
+    synthGroup.rotation.y = -0.24 + Math.sin(elapsed * 0.11 + 1.2) * 0.025;
+
+    // Packet flow
+    packets.forEach(pkt => {
+      pkt.userData.t = (pkt.userData.t + pkt.userData.spd * dt) % 1;
+      const t01 = pkt.userData.t;
+      const pt  = curves[pkt.userData.bi].getPoint(t01);
+      pkt.position.copy(pt);
+      const edge = 0.12;
+      pkt.material.opacity = Math.min(t01 / edge, 1) * Math.min((1 - t01) / edge, 1) * 0.92;
+      const s = 0.75 + Math.sin(elapsed * 5 + pkt.userData.bi * 1.3) * 0.25;
+      pkt.scale.setScalar(s);
+    });
+
+    // Beam pulse
+    beamLines.forEach((l, i) => {
+      l.material.opacity = 0.07 + Math.sin(elapsed * 0.9 + i * 0.8) * 0.045;
+    });
+
+    // Ring rotation
+    rings.forEach(ring => { ring.rotation.z += ring.userData.spd; });
+
+    // Particle drift
+    animateParticleCloud(ambReal,  24);
+    animateParticleCloud(ambSynth, 24);
+    animateParticleCloud(ambMid,   10);
+
+    // Camera slow drift
+    camera.position.x = Math.sin(elapsed * 0.055) * 0.7;
+    camera.position.y = 0.6 + Math.sin(elapsed * 0.038) * 0.28;
+    camera.lookAt(0, 0.1, 0);
+
+    renderer.render(scene, camera);
+  }
+
+  // Start immediately, pause when off-screen for performance
+  running = true;
+  clock.start();
+  animate();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting && running) {
+        running = false;
+        cancelAnimationFrame(rafId);
+      } else if (entry.isIntersecting && !running) {
+        running = true;
+        clock.start();
+        animate();
+      }
+    });
+  }, { threshold: 0.05 });
+  observer.observe(section);
+
+  // ── Resize handler ────────────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    const s = getSize();
+    renderer.setSize(s.w, s.h);
+    camera.aspect = s.w / s.h;
+    camera.updateProjectionMatrix();
+  });
+
+})();
+</script>
 </body>
 </html>
