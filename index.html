@@ -1147,8 +1147,8 @@ window.addEventListener('load', () => {
   gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 0, y: 20 });
   const tl = gsap.timeline({ delay: 0.3 });
   tl.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' })
-    .add(() => scramble(document.getElementById('scramble-target'), 'Synthetic', 1.0), '-=0.05')
-    .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.8')
+    .add(() => scramble(document.getElementById('scramble-target'), 'Synthetic', 0.6), '-=0.05')
+    .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.2')
     .to('#hero-meta',  { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
     .to('#hero-cta',   { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25');
   // Safety fallback
