@@ -155,11 +155,17 @@
     .partner-strip .lbl { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-muted); white-space: nowrap; }
     .partner-logos { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
     .partner-pill {
-      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; color: var(--silver);
-      padding: 0.28rem 0.8rem; border: 1px solid rgba(212,212,220,0.2); border-radius: 3px;
-      transition: border-color 0.2s, color 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: var(--silver);
+      padding: 0.5rem 0.8rem; border: 1px solid rgba(212,212,220,0.2); border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s; text-align: center;
     }
     .partner-pill:hover { border-color: var(--gold); color: var(--gold); }
+    .partner-pill img, .partner-pill object { height: 32px; width: auto; max-width: 110px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.85; transition: opacity 0.2s; }
+    .partner-pill:hover img, .partner-pill:hover object { opacity: 1; filter: brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
+    .partner-pill img.logo-colour { filter: none; opacity: 0.9; }
+    .partner-pill:hover img.logo-colour { filter: none; opacity: 1; }
+    .partner-pill .pill-name { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
 
     /* ─── WELCOME ───────────────────────────────────────────── */
     #welcome { background: var(--grey); padding: 7rem 3rem; }
@@ -504,11 +510,26 @@
   <div class="partner-strip">
     <span class="lbl">Delivered in partnership with</span>
     <div class="partner-logos">
-      <span class="partner-pill">Digital Health CRC</span>
-      <span class="partner-pill">La Trobe University</span>
-      <span class="partner-pill">University of Sydney</span>
-      <span class="partner-pill">Swansea University</span>
-      <span class="partner-pill">SAIL Databank</span>
+      <span class="partner-pill">
+        <img src="logos/dhcrc.png" alt="Digital Health CRC" loading="lazy" class="logo-colour">
+        <span class="pill-name">Digital Health CRC</span>
+      </span>
+      <span class="partner-pill">
+        <img src="logos/latrobe_white.svg" alt="La Trobe University" loading="lazy">
+        <span class="pill-name">La Trobe University</span>
+      </span>
+      <span class="partner-pill">
+        <img src="logos/usyd_white.svg" alt="University of Sydney" loading="lazy">
+        <span class="pill-name">University of Sydney</span>
+      </span>
+      <span class="partner-pill">
+        <img src="logos/swansea.svg" alt="Swansea University" loading="lazy">
+        <span class="pill-name">Swansea University</span>
+      </span>
+      <span class="partner-pill">
+        <img src="logos/sail.png" alt="SAIL Databank" loading="lazy">
+        <span class="pill-name">SAIL Databank</span>
+      </span>
     </div>
   </div>
 </section>
