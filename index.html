@@ -893,241 +893,193 @@
 
 <!-- ═══ JAVASCRIPT ══════════════════════════════════════════════ -->
 <script>
-  gsap.registerPlugin(ScrollTrigger);
+'use strict';
+gsap.registerPlugin(ScrollTrigger);
 
-  /* ── FinisherHeader particle engine ─────────────────────── */
-  class FinisherHeader {
-    constructor(cfg) {
-      this.cfg = cfg;
-      this.canvas = document.getElementById('finisher-canvas');
-      this.ctx    = this.canvas.getContext('2d');
-      this.particles = [];
-      this._raf   = null;
-      this._resize = this._resize.bind(this);
-      this._loop   = this._loop.bind(this);
-      window.addEventListener('resize', this._resize);
-      this._resize();
-      this._build();
-      cancelAnimationFrame(this._raf);
-      this._raf = requestAnimationFrame(this._loop);
-    }
-    update(cfg) { this.cfg = cfg; this._resize(); this._build(); }
-    _resize() {
-      const wrap = this.canvas.parentElement;
-      this.W = wrap.offsetWidth;
-      this.H = wrap.offsetHeight;
-      this.canvas.width  = this.W;
-      this.canvas.height = this.H;
-      this.skewPad = Math.abs(Math.tan(this.cfg.skew * Math.PI / 180) * this.H);
-    }
-    _build() {
-      this.particles = [];
-      for (let i = 0; i < this.cfg.count; i++) this.particles.push(this._spawn(true));
-    }
-    _rand(min, max) { return min + Math.random() * (max - min); }
-    _pick(arr)      { return arr[Math.floor(Math.random() * arr.length)]; }
-    _spawn(randomY = false) {
-      const { size, speed, colors, opacity } = this.cfg;
-      const baseSize = this._rand(size.min, size.max);
-      return {
-        x:          this._rand(-this.skewPad, this.W + this.skewPad),
-        y:          randomY ? this._rand(0, this.H) : this.H + size.max * 2,
-        size: baseSize, baseSize,
-        vx:         this._rand(speed.x.min, speed.x.max) * (Math.random() < 0.5 ? 1 : -1),
-        vy:        -(this._rand(speed.y.min, speed.y.max) || 0.05),
-        color:      this._pick(colors.particles),
-        word:       this._pick(FinisherHeader.WORDS),
-        phase:      this._rand(0, Math.PI * 2),
-        pulseSpeed: this._rand(0.008, 0.02),
-        rotation:   this._rand(-0.1, 0.1),
-        rotSpeed:   this._rand(-0.0005, 0.0005),
-      };
-    }
-    _opacity(p) {
-      const { opacity } = this.cfg;
-      const cx = this.W / 2, cy = this.H / 2;
-      const maxDist = Math.sqrt(cx * cx + cy * cy);
-      const dist = Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2);
-      const t = Math.min(dist / maxDist, 1);
-      return opacity.center + (opacity.edge - opacity.center) * t;
-    }
-    _draw(p) {
-      const ctx = this.ctx;
-      const alpha = this._opacity(p);
-      if (alpha <= 0) return;
-      const hex = p.color.replace('#', '');
-      const r = parseInt(hex.substring(0,2), 16);
-      const g = parseInt(hex.substring(2,4), 16);
-      const b = parseInt(hex.substring(4,6), 16);
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle   = `rgb(${r},${g},${b})`;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-      const fontSize = Math.max(7, p.size * 0.85);
-      ctx.font = `${fontSize}px 'SF Mono','Fira Mono','Consolas',monospace`;
-      ctx.fillText(p.word, -ctx.measureText(p.word).width / 2, fontSize / 3);
-      ctx.restore();
-    }
-    _loop(ts) {
-      this._raf = requestAnimationFrame(this._loop);
-      const { size, colors, blending, skew } = this.cfg;
-      const ctx = this.ctx;
-      const W = this.W, H = this.H;
-      ctx.clearRect(0, 0, W, H);
-      ctx.save();
-      ctx.translate(W / 2, H / 2);
-      ctx.transform(1, 0, Math.tan(skew * Math.PI / 180), 1, 0, 0);
-      ctx.translate(-W / 2, -H / 2);
-      ctx.fillStyle = colors.background;
-      ctx.fillRect(-this.skewPad * 2, 0, W + this.skewPad * 4, H);
-      ctx.globalCompositeOperation = blending || 'source-over';
-      for (let i = 0; i < this.particles.length; i++) {
-        const p = this.particles[i];
-        p.phase += p.pulseSpeed;
-        p.size   = p.baseSize + Math.sin(p.phase) * (p.baseSize * size.pulse);
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rotation += p.rotSpeed;
-        if (p.y < -size.max * 2) this.particles[i] = this._spawn(false);
-        const pad = this.skewPad + size.max;
-        if (p.x > W + pad) p.x = -pad;
-        if (p.x < -pad)    p.x =  W + pad;
-        this._draw(p);
-      }
-      ctx.restore();
-    }
+/* ══ FinisherHeader ══════════════════════════════════════════════════════════ */
+class FinisherHeader {
+  constructor(opts) {
+    this.opts = opts;
+    this.canvas = document.getElementById('finisher-canvas');
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.particles = [];
+    this._resize();
+    window.addEventListener('resize', () => this._resize());
+    for (let i = 0; i < opts.count; i++) this.particles.push(this._spawn(true));
+    this._loop();
   }
-  FinisherHeader.WORDS = [
-    'patient_id','date_of_birth','gender','diagnosis_code','medication_name',
-    'bp_systolic','heart_rate','lab_result_value','encounter_date','provider_id',
-    'patient_name','ethnicity','race','marital_status','postal_code',
-    'bp_diastolic','respiratory_rate','body_temperature','oxygen_saturation',
-    'weight_kg','height_cm','bmi','lab_test_name','lab_unit',
-    'medication_dosage','medication_route','frequency','prescription_start_date',
-    'prescription_end_date','allergy_allergen','allergy_severity',
-    'immunization_type','immunization_date','smoking_status','procedure_code',
-    'procedure_date','admission_type','discharge_status','insurance_provider',
-    'policy_number','synthetic_id','privacy_budget','epsilon_value',
-    'fidelity_score','utility_metric','k_anonymity','l_diversity',
-    'differential_privacy','federated_node','data_custodian'
-  ];
-
-  /* Dark Horse config for FinisherHeader */
-  const finisherCfg = {
-    count: 90,
-    size:   { min: 8, max: 17, pulse: 0.12 },
-    speed:  { x: { min: 0, max: 0.25 }, y: { min: 0.03, max: 0.12 } },
-    colors: {
-      background: '#1d1e22',
-      particles:  ['#feda6a','#c9a84c','#d4d4dc','#393f4d','#f5f4f0']
-    },
-    blending: 'screen',
-    opacity:  { center: 0, edge: 0.38 },
-    skew: -1.5,
-  };
-  new FinisherHeader(finisherCfg);
-
-  /* ── Scramble: 1 second, all letters simultaneously ─────────── */
-  function scramble(el, finalText, duration) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const totalFrames = Math.round(duration * 60);
-    // All letters scramble together, then all resolve together at ~65% through
-    const resolveStart = Math.round(totalFrames * 0.55);
-    let frame = 0;
-
-    function rnd() { return chars[Math.floor(Math.random() * chars.length)]; }
-
-    function tick() {
-      frame++;
-      if (frame < resolveStart) {
-        // Pure scramble phase — every character randomises every frame
-        el.textContent = Array.from(finalText).map(c => c === ' ' ? ' ' : rnd()).join('');
-      } else {
-        // Resolve phase — all letters snap to final simultaneously based on eased progress
-        const t = (frame - resolveStart) / (totalFrames - resolveStart);
-        const eased = t * t * (3 - 2 * t); // smoothstep
-        if (eased >= 1) { el.textContent = finalText; return; }
-        // Stagger each character slightly around the resolve point
-        let out = '';
-        for (let i = 0; i < finalText.length; i++) {
-          const charT = (eased - i * 0.04);
-          out += charT >= 1 ? finalText[i] : (finalText[i] === ' ' ? ' ' : rnd());
-        }
-        el.textContent = out;
-      }
-      if (frame < totalFrames) requestAnimationFrame(tick);
-      else el.textContent = finalText;
-    }
-
-    el.textContent = Array.from(finalText).map(c => c === ' ' ? ' ' : rnd()).join('');
-    requestAnimationFrame(tick);
+  _resize() {
+    this.W = this.canvas.width  = this.canvas.offsetWidth;
+    this.H = this.canvas.height = this.canvas.offsetHeight;
   }
-
-  /* ── Hero entrance ────────────────────────────────────────── */
-  window.addEventListener('load', () => {
-    // Set initial hidden states
-    gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 0, y: 20 });
-
-    const tl = gsap.timeline({ delay: 0.3 });
-    tl.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' })
-      .add(() => scramble(document.getElementById('scramble-target'), 'Synthetic', 1.0), '-=0.05')
-      .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.8')
-      .to('#hero-meta', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
-      .to('#hero-cta', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25');
-
-    // Safety fallback: ensure all hero content visible after 4s regardless
-    setTimeout(() => {
-      gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 1, y: 0 });
-    }, 4000);
-  }); // end window load
-
-  /* ── GSAP Pinned Panels with Overscroll ─────────────────────────────────── */
-  // Each section slides up as it enters the viewport.
-  // Only sections that are NOT already in the viewport get the y:40 starting offset.
-  const pinnedSections = ['#welcome', '#speakers', '#sessions', '#attend', '#reasons', '#testimonial', '#venue'];
-  pinnedSections.forEach((sel, i) => {
-    const el = document.querySelector(sel);
-    if (!el) return;
-    el.style.position = 'relative';
-    el.style.zIndex   = 10 + i;
-    el.style.willChange = 'transform';
-    const rect = el.getBoundingClientRect();
-    const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
-    if (!alreadyVisible) {
-      gsap.set(el, { y: 40 });
+  _rand(a, b) { return a + Math.random() * (b - a); }
+  _spawn(random) {
+    const size = this._rand(this.opts.size.min, this.opts.size.max);
+    const col  = this.opts.colors.particles[Math.floor(Math.random() * this.opts.colors.particles.length)];
+    const word = FinisherHeader.WORDS[Math.floor(Math.random() * FinisherHeader.WORDS.length)];
+    return {
+      x:        this._rand(0, this.W),
+      y:        random ? this._rand(0, this.H) : this.H + size * 2,
+      size,
+      color:    col,
+      word,
+      speedX:   this._rand(this.opts.speed.x.min, this.opts.speed.x.max) * (Math.random() < 0.5 ? 1 : -1),
+      speedY:  -this._rand(this.opts.speed.y.min, this.opts.speed.y.max),
+      opacity:  this._rand(0.08, this.opts.opacity.edge),
+      rotation: this._rand(0, Math.PI * 2),
+      rotSpeed: this._rand(-0.003, 0.003),
+    };
+  }
+  _draw(p) {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle   = p.color;
+    ctx.font        = `${p.size}px 'DM Sans', monospace`;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.fillText(p.word, 0, 0);
+    ctx.restore();
+  }
+  _loop() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.W, this.H);
+    ctx.save();
+    ctx.fillStyle = this.opts.colors.background;
+    ctx.fillRect(0, 0, this.W, this.H);
+    ctx.restore();
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i];
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.rotation += p.rotSpeed;
+      if (p.y < -this.opts.size.max * 2) this.particles[i] = this._spawn(false);
+      const pad = this.opts.size.max + 20;
+      if (p.x > this.W + pad) p.x = -pad;
+      if (p.x < -pad)         p.x =  this.W + pad;
+      this._draw(p);
     }
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 95%',
-      end:   'top 30%',
-      onEnter: () => gsap.to(el, { y: 0, duration: 0.7, ease: 'power3.out', overwrite: 'auto' }),
-      onEnterBack: () => gsap.to(el, { y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' }),
-    });
-  });
+    requestAnimationFrame(() => this._loop());
+  }
+}
+FinisherHeader.WORDS = [
+  'patient_id','date_of_birth','gender','diagnosis_code','medication_name',
+  'bp_systolic','heart_rate','lab_result_value','encounter_date','provider_id',
+  'patient_name','ethnicity','race','marital_status','postal_code',
+  'bp_diastolic','respiratory_rate','body_temperature','oxygen_saturation',
+  'weight_kg','height_cm','bmi','lab_test_name','lab_unit',
+  'medication_dosage','medication_route','frequency','prescription_start_date',
+  'prescription_end_date','allergy_allergen','allergy_severity',
+  'immunization_type','immunization_date','smoking_status','procedure_code',
+  'procedure_date','admission_type','discharge_status','insurance_provider',
+  'policy_number','synthetic_id','privacy_budget','epsilon_value',
+  'fidelity_score','utility_metric','k_anonymity','l_diversity',
+  'differential_privacy','federated_node','data_custodian'
+];
 
-  /* ── IntersectionObserver-based scroll reveals ─────────────────────────── */
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); revealObs.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .speaker-card, .venue-card, .session-card, .attend-tag, .reason-item').forEach(el => {
-    revealObs.observe(el);
-  });
+/* Dark Horse config for FinisherHeader */
+new FinisherHeader({
+  count: 90,
+  size:   { min: 8, max: 17, pulse: 0.12 },
+  speed:  { x: { min: 0, max: 0.25 }, y: { min: 0.03, max: 0.12 } },
+  colors: {
+    background: '#1d1e22',
+    particles:  ['#feda6a','#c9a84c','#d4d4dc','#393f4d','#f5f4f0']
+  },
+  blending: 'screen',
+  opacity:  { center: 0, edge: 0.38 },
+  skew: -1.5,
+});
 
-  /* ── Navbar compact on scroll ─────────────────────────────────────────── */
+/* ══ Scramble: setInterval-based so it works in background tabs ══════════════ */
+function scramble(el, finalText, duration) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const fps = 30;
+  const totalFrames = Math.round(duration * fps);
+  const resolveStart = Math.round(totalFrames * 0.55);
+  let frame = 0;
+  function rnd() { return chars[Math.floor(Math.random() * chars.length)]; }
+  const timer = setInterval(() => {
+    frame++;
+    if (frame < resolveStart) {
+      el.textContent = Array.from(finalText).map(c => c === ' ' ? ' ' : rnd()).join('');
+    } else {
+      const t = (frame - resolveStart) / (totalFrames - resolveStart);
+      const eased = t * t * (3 - 2 * t);
+      if (eased >= 1) { el.textContent = finalText; clearInterval(timer); return; }
+      let out = '';
+      for (let i = 0; i < finalText.length; i++) {
+        const charT = eased - i * 0.04;
+        out += charT >= 1 ? finalText[i] : (finalText[i] === ' ' ? ' ' : rnd());
+      }
+      el.textContent = out;
+    }
+    if (frame >= totalFrames) { el.textContent = finalText; clearInterval(timer); }
+  }, 1000 / fps);
+  // Hard fallback
+  setTimeout(() => { el.textContent = finalText; clearInterval(timer); }, duration * 1000 + 600);
+}
+
+/* ══ Hero entrance animation ═════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 0, y: 20 });
+  const tl = gsap.timeline({ delay: 0.3 });
+  tl.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' })
+    .add(() => scramble(document.getElementById('scramble-target'), 'Synthetic', 1.0), '-=0.05')
+    .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.8')
+    .to('#hero-meta',  { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+    .to('#hero-cta',   { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25');
+  // Safety fallback
+  setTimeout(() => {
+    gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 1, y: 0 });
+  }, 4000);
+});
+
+/* ══ GSAP Pinned Panels — slide-up on enter ══════════════════════════════════ */
+const pinnedSections = ['#welcome','#speakers','#sessions','#attend','#reasons','#testimonial','#venue'];
+pinnedSections.forEach((sel, i) => {
+  const el = document.querySelector(sel);
+  if (!el) return;
+  el.style.position  = 'relative';
+  el.style.zIndex    = 10 + i;
+  el.style.willChange = 'transform';
+  const rect = el.getBoundingClientRect();
+  if (!(rect.top < window.innerHeight && rect.bottom > 0)) {
+    gsap.set(el, { y: 40 });
+  }
   ScrollTrigger.create({
-    start: 'top -60',
-    onUpdate(self) {
-      document.getElementById('nav').style.padding =
-        self.direction === 1 ? '0.55rem 3rem' : '1rem 3rem';
-    },
+    trigger: el,
+    start: 'top 95%',
+    end:   'top 30%',
+    onEnter:      () => gsap.to(el, { y: 0, duration: 0.7, ease: 'power3.out', overwrite: 'auto' }),
+    onEnterBack:  () => gsap.to(el, { y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' }),
   });
+});
 
-  /* ── Parallax on photo break ────────────────────────────────────────────── */
-  gsap.to('.photo-break img', {
-    scrollTrigger: { trigger: '.photo-break', start: 'top bottom', end: 'bottom top', scrub: true },
-    y: 60, ease: 'none',
+/* ══ IntersectionObserver scroll reveals ════════════════════════════════════ */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in-view'); revealObs.unobserve(e.target); }
   });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.speaker-card,.venue-card,.session-card,.attend-tag,.reason-item')
+  .forEach(el => revealObs.observe(el));
+
+/* ══ Navbar compact on scroll ═══════════════════════════════════════════════ */
+ScrollTrigger.create({
+  start: 'top -60',
+  onUpdate(self) {
+    document.getElementById('nav').style.padding =
+      self.direction === 1 ? '0.55rem 3rem' : '1rem 3rem';
+  },
+});
+
+/* ══ Parallax on photo break ════════════════════════════════════════════════ */
+gsap.to('.photo-break img', {
+  scrollTrigger: { trigger: '.photo-break', start: 'top bottom', end: 'bottom top', scrub: true },
+  y: 60, ease: 'none',
+});
 </script>
 </body>
 </html>
