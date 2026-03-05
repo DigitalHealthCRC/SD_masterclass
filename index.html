@@ -441,6 +441,59 @@
       .venue-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
       .attend-tags { grid-template-columns: 1fr; }
+
+      /* ── Hero mobile fix ── */
+      #hero {
+        padding: 0 1.5rem;
+        justify-content: flex-start;
+        min-height: unset;
+        height: auto;
+      }
+      .hero-inner {
+        padding-top: 90px;
+        padding-bottom: 2rem;
+      }
+      .hero-meta {
+        gap: 0.8rem 1.2rem;
+      }
+      .hero-divider { display: none; }
+      .hero-meta-item { min-width: 40%; }
+      .hero-cta {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .hero-cta .btn { text-align: center; }
+
+      /* Partner strip: exit absolute positioning on mobile */
+      .partner-strip {
+        position: relative;
+        bottom: auto; left: auto; right: auto;
+        padding: 2rem 1.5rem 2.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        background: rgba(2, 11, 22, 0.55);
+        backdrop-filter: blur(8px);
+      }
+      .partner-logos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem 0.8rem;
+        width: 100%;
+        align-items: end;
+      }
+      .partner-pill {
+        padding: 0.3rem 0.2rem;
+      }
+      .partner-pill img,
+      .partner-pill object {
+        height: 36px;
+        max-width: 90px;
+      }
+      .partner-pill img.logo-colour { height: 36px; max-width: 90px; }
+      .partner-pill img.logo-lg { height: 44px; max-width: 100px; }
+      .partner-pill img.logo-colour.logo-lg { height: 44px; max-width: 100px; }
+      .partner-pill .pill-name { font-size: 0.52rem; }
     }
     @media (max-width: 480px) {
       .speakers-grid { grid-template-columns: 1fr 1fr; }
