@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthetic Health Data Masterclass Series 2026</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ─── Variables ─────────────────────────────────────────── */
+    :root {
+      --dark:       #1d1e22;
+      --grey:       #393f4d;
+      --silver:     #d4d4dc;
+      --gold:       #feda6a;
+      --gold-muted: #c9a84c;
+      --charcoal:   #2c2f3a;
+      --off-white:  #f5f4f0;
+      --display:    'Bebas Neue', sans-serif;
+      --body:       'DM Sans', sans-serif;
+    }
+
+    /* ─── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--body); background: var(--dark); color: var(--off-white); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── Noise overlay ─────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.3;
+    }
+
+    /* ─── Multicolour rule (like reference site) ────────────── */
+    .colour-rule {
+      display: flex; gap: 3px; margin: 0.6rem 0 2rem;
+    }
+    .colour-rule span {
+      height: 4px; border-radius: 2px;
+    }
+    .cr-1 { background: #e63946; width: 40px; }
+    .cr-2 { background: #f4a261; width: 28px; }
+    .cr-3 { background: #e9c46a; width: 22px; }
+    .cr-4 { background: #2a9d8f; width: 30px; }
+    .cr-5 { background: var(--gold); width: 18px; }
+
+    /* ─── Buttons ───────────────────────────────────────────── */
+    .btn {
+      display: inline-block; padding: 0.55rem 1.5rem;
+      border-radius: 100px; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-outline { border: 1.5px solid var(--gold); color: var(--gold); background: transparent; }
+    .btn-outline:hover { background: var(--gold); color: var(--dark); }
+    .btn-fill { background: var(--gold); color: var(--dark); border: 1.5px solid var(--gold); }
+    .btn-fill:hover { background: transparent; color: var(--gold); }
+
+    /* ─── Section headings ──────────────────────────────────── */
+    .section-eyebrow {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--gold-muted); margin-bottom: 0.4rem;
+    }
+    .section-heading {
+      font-family: var(--display); font-size: clamp(2.2rem, 4vw, 3.2rem);
+      letter-spacing: 0.04em; line-height: 1; color: var(--gold);
+    }
+    .section-heading.dark { color: var(--dark); }
+    .section-heading.white { color: var(--off-white); }
+
+    /* ─── NAV ───────────────────────────────────────────────── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 3rem;
+      background: rgba(29,30,34,0.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(254,218,106,0.1);
+      transition: padding 0.3s;
+    }
+    .nav-logo {
+      font-family: var(--display); font-size: 1.2rem; letter-spacing: 0.08em; color: var(--gold);
+    }
+    .nav-logo span { display: block; font-family: var(--body); font-size: 0.58rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--silver); }
+    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
+    .nav-links a { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta { display: flex; gap: 0.6rem; }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; position: relative; overflow: hidden;
+      background: var(--dark); padding: 0 3rem;
+    }
+    /* FinisherHeader canvas fills hero */
+    #finisher-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block; z-index: 0;
+    }
+    /* Subtle dark vignette over canvas so text stays readable */
+    #hero::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+      background: radial-gradient(ellipse at 40% 50%, rgba(29,30,34,0.45) 0%, rgba(29,30,34,0.75) 100%);
+    }
+    .hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; width: 100%; padding-top: 100px; }
+    .hero-eyebrow {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--gold-muted); margin-bottom: 1.4rem;
+      opacity: 0; transform: translateY(16px);
+    }
+    .hero-title {
+      font-family: var(--display); line-height: 0.95; letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+    }
+    .hero-title .line1 {
+      font-size: clamp(3.5rem, 8vw, 7.5rem); display: block;
+    }
+    .hero-title .scramble-word { color: var(--gold); }
+    .hero-title .normal-word  { color: var(--off-white); }
+    .hero-title .line2 {
+      font-size: clamp(1.8rem, 3.5vw, 3.8rem); display: block;
+      color: var(--off-white); margin-top: 0.3rem;
+      opacity: 0; transform: translateY(24px);
+    }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 2.5rem;
+      opacity: 0; transform: translateY(16px);
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 0.15rem; }
+    .hero-meta-item .lbl { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-muted); }
+    .hero-meta-item .val { font-size: 0.92rem; font-weight: 500; color: var(--off-white); }
+    .hero-divider { width: 1px; background: rgba(254,218,106,0.2); align-self: stretch; }
+    .hero-cta { display: flex; gap: 1rem; opacity: 0; transform: translateY(16px); }
+
+    /* Partner strip */
+    .partner-strip {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      background: rgba(57,63,77,0.7); backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(254,218,106,0.1);
+      padding: 1rem 3rem; display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+    }
+    .partner-strip .lbl { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-muted); white-space: nowrap; }
+    .partner-logos { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+    .partner-pill {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; color: var(--silver);
+      padding: 0.28rem 0.8rem; border: 1px solid rgba(212,212,220,0.2); border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .partner-pill:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── WELCOME ───────────────────────────────────────────── */
+    #welcome { background: var(--grey); padding: 7rem 3rem; }
+    .welcome-wrap {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 340px 1fr; gap: 5rem; align-items: start;
+    }
+    .welcome-sidebar { position: sticky; top: 100px; }
+    .welcome-sidebar .avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--charcoal); border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.2rem; overflow: hidden;
+    }
+    .welcome-sidebar .avatar svg { width: 52px; height: 52px; opacity: 0.4; }
+    .welcome-sidebar .name { font-family: var(--display); font-size: 1.6rem; letter-spacing: 0.04em; color: var(--gold); margin-bottom: 0.3rem; }
+    .welcome-sidebar .role { font-size: 0.8rem; color: var(--silver); line-height: 1.6; font-weight: 300; }
+    .welcome-sidebar .org  { font-size: 0.78rem; font-weight: 700; color: var(--gold-muted); margin-top: 0.2rem; }
+    .welcome-body p { font-size: 0.97rem; line-height: 1.85; color: var(--off-white); font-weight: 300; margin-bottom: 1.4rem; }
+
+    /* ─── SPEAKERS ──────────────────────────────────────────── */
+    #speakers { background: var(--silver); padding: 7rem 3rem; }
+    .speakers-wrap { max-width: 1200px; margin: 0 auto; }
+    /* 4-column grid matching reference site */
+    .speakers-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin-top: 3rem;
+    }
+    .speaker-card {
+      background: var(--charcoal); border-radius: 8px;
+      border: 1px solid transparent; overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      cursor: pointer; position: relative;
+    }
+    /* Dot-pattern overlay like reference site */
+    .speaker-card::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(254,218,106,0.06) 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+    .speaker-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+    .speaker-card-img {
+      width: 100%; aspect-ratio: 1; background: var(--grey);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 1; overflow: hidden;
+    }
+    .speaker-card-img svg { width: 60px; height: 60px; opacity: 0.25; }
+    .speaker-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .speaker-card:hover .speaker-card-img img { transform: scale(1.05); }
+    /* Dashed hover border on image like reference site */
+    .speaker-card-img::after {
+      content: ''; position: absolute; inset: 8px;
+      border: 1.5px dashed rgba(254,218,106,0); border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    .speaker-card:hover .speaker-card-img::after { border-color: rgba(254,218,106,0.5); }
+    .speaker-card-body { padding: 1.2rem; position: relative; z-index: 1; text-align: center; }
+    .speaker-tag {
+      display: inline-block; font-size: 0.55rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; padding: 0.18rem 0.55rem; border-radius: 2px;
+      background: rgba(254,218,106,0.12); color: var(--gold); margin-bottom: 0.6rem;
+    }
+    .speaker-name { font-family: var(--display); font-size: 1.15rem; letter-spacing: 0.04em; color: var(--off-white); line-height: 1.1; margin-bottom: 0.4rem; }
+    .speaker-role { font-size: 0.75rem; color: var(--silver); line-height: 1.5; font-weight: 300; margin-bottom: 0.3rem; }
+    .speaker-org  { font-size: 0.7rem; font-weight: 700; color: var(--gold-muted); }
+    .speakers-cta { text-align: center; margin-top: 2.5rem; }
+
+    /* ─── PHOTO BREAK (between speakers and sessions) ───────── */
+    .photo-break {
+      width: 100%; height: 320px; overflow: hidden; position: relative;
+    }
+    .photo-break img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.45) saturate(0.7);
+    }
+    .photo-break-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(29,30,34,0.6) 0%, rgba(57,63,77,0.4) 100%);
+    }
+    .photo-break-text {
+      font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0.06em; color: var(--gold); text-align: center; text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    }
+
+    /* ─── SESSIONS ──────────────────────────────────────────── */
+    #sessions { background: var(--dark); padding: 7rem 3rem; }
+    .sessions-wrap { max-width: 1200px; margin: 0 auto; }
+    .sessions-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .session-card {
+      background: var(--charcoal); border-left: 3px solid var(--gold);
+      border-radius: 0 6px 6px 0; padding: 2rem;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .session-card:hover { background: #343846; transform: translateY(-4px); }
+    .session-num { font-family: var(--display); font-size: 3.5rem; color: rgba(254,218,106,0.1); line-height: 1; margin-bottom: 0.4rem; }
+    .session-title { font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.03em; color: var(--gold); margin-bottom: 0.8rem; line-height: 1.2; }
+    .session-desc { font-size: 0.87rem; line-height: 1.75; color: var(--silver); font-weight: 300; margin-bottom: 1rem; }
+    .session-contrib { font-size: 0.7rem; color: var(--gold-muted); letter-spacing: 0.05em; }
+
+    /* ─── WHO SHOULD ATTEND ─────────────────────────────────── */
+    #attend {
+      position: relative; overflow: hidden;
+      background: var(--grey); padding: 7rem 3rem;
+    }
+    /* Full-bleed background photo with overlay */
+    #attend::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      background: url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1400&q=50') center/cover no-repeat;
+      filter: brightness(0.18) saturate(0.5);
+    }
+    .attend-wrap {
+      position: relative; z-index: 1; max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 420px 1fr; gap: 5rem; align-items: start;
+    }
+    .attend-intro p { font-size: 0.9rem; line-height: 1.8; color: var(--silver); font-weight: 300; max-width: 360px; margin-top: 1rem; }
+    /* 2-col tag list */
+    .attend-tags {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 3rem;
+    }
+    .attend-tag {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.9rem 1rem; background: rgba(29,30,34,0.6);
+      border: 1px solid rgba(254,218,106,0.1); border-radius: 4px;
+      transition: border-color 0.25s, background 0.25s; cursor: default;
+    }
+    .attend-tag:hover { border-color: var(--gold); background: rgba(254,218,106,0.05); }
+    .attend-tag-icon {
+      width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
+      background: rgba(254,218,106,0.1); display: flex; align-items: center; justify-content: center;
+    }
+    .attend-tag-icon svg { width: 13px; height: 13px; fill: var(--gold); }
+    .attend-tag-text { font-size: 0.83rem; color: var(--off-white); font-weight: 400; }
+
+    /* ─── REASONS TO ATTEND ─────────────────────────────────── */
+    #reasons { background: var(--silver); padding: 7rem 3rem; }
+    .reasons-wrap { max-width: 1200px; margin: 0 auto; }
+    /* 2-col layout: checklist left, session-speakers right (like reference) */
+    .reasons-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; align-items: start;
+    }
+    .reasons-list { display: flex; flex-direction: column; gap: 0; }
+    .reason-item {
+      display: flex; align-items: flex-start; gap: 0.9rem;
+      padding: 1rem 1.2rem; border-bottom: 1px solid rgba(57,63,77,0.3);
+      transition: background 0.2s;
+    }
+    .reason-item:first-child { border-top: 1px solid rgba(57,63,77,0.3); }
+    .reason-item:hover { background: rgba(57,63,77,0.15); }
+    .reason-check {
+      width: 22px; height: 22px; min-width: 22px; margin-top: 0.1rem;
+      border-radius: 50%; background: rgba(254,218,106,0.12);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .reason-check svg { width: 11px; height: 11px; stroke: var(--gold); fill: none; stroke-width: 2.5; }
+    .reason-text { font-size: 0.87rem; line-height: 1.65; color: var(--dark); font-weight: 400; }
+    /* Right panel: session categories with speaker mini-cards */
+    .reasons-sessions { display: flex; flex-direction: column; gap: 1.5rem; }
+    .reason-session-group { }
+    .reason-session-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold-muted); padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(57,63,77,0.4); margin-bottom: 0.8rem;
+    }
+    .reason-speaker-row {
+      display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(57,63,77,0.2); transition: background 0.2s;
+    }
+    .reason-speaker-row:hover { background: rgba(57,63,77,0.1); padding-left: 0.4rem; }
+       .reason-speaker-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--charcoal); border: 1.5px solid rgba(254,218,106,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .reason-speaker-avatar svg { width: 22px; height: 22px; opacity: 0.3; }
+    .reason-speaker-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .reason-speaker-info .rsi-name { font-size: 0.82rem; font-weight: 600; color: var(--dark); }
+    .reason-speaker-info .rsi-role { font-size: 0.72rem; color: var(--grey); font-weight: 300; }
+    .reason-speaker-info .rsi-org  { font-size: 0.7rem; font-weight: 700; color: var(--dark); }
+
+    /* ─── TESTIMONIAL ───────────────────────────────────────── */
+    #testimonial { background: var(--dark); padding: 7rem 3rem; text-align: center; }
+    .testimonial-wrap { max-width: 820px; margin: 0 auto; }
+    .quote-mark { font-family: var(--display); font-size: 9rem; color: var(--gold); line-height: 0.6; opacity: 0.35; margin-bottom: 1.5rem; }
+    .quote-text { font-size: clamp(1rem, 2.2vw, 1.4rem); font-weight: 300; font-style: italic; line-height: 1.8; color: var(--off-white); margin-bottom: 2rem; }
+    .quote-attr { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-muted); }
+
+    /* ─── VENUE ─────────────────────────────────────────────── */
+    #venue { background: var(--grey); padding: 7rem 3rem; }
+    .venue-wrap { max-width: 1200px; margin: 0 auto; }
+    /* 3-col venue cards — each is a split image+info panel */
+    .venue-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .venue-card {
+      border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(254,218,106,0.1);
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      background: var(--charcoal);
+    }
+    .venue-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 14px 36px rgba(0,0,0,0.45); }
+    .venue-img {
+      width: 100%; height: 200px; position: relative; overflow: hidden;
+    }
+    .venue-img-bg {
+      position: absolute; inset: 0; background-size: cover; background-position: center;
+      filter: brightness(0.35) saturate(0.6); transition: filter 0.4s;
+    }
+    .venue-card:hover .venue-img-bg { filter: brightness(0.5) saturate(0.8); }
+    .venue-city-code {
+      position: relative; z-index: 1; font-family: var(--display);
+      font-size: 3.5rem; letter-spacing: 0.1em; color: var(--gold);
+      text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+      display: flex; align-items: center; justify-content: center;
+      height: 100%;
+    }
+    .venue-body { padding: 1.5rem; }
+    .venue-city-name { font-family: var(--display); font-size: 1.5rem; letter-spacing: 0.04em; color: var(--gold); margin-bottom: 0.8rem; }
+    .venue-row { display: flex; gap: 0.5rem; margin-bottom: 0.45rem; align-items: flex-start; }
+    .venue-row-lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-muted); min-width: 48px; padding-top: 0.1rem; }
+    .venue-row-val { font-size: 0.8rem; color: var(--silver); line-height: 1.5; font-weight: 300; }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer { background: var(--dark); border-top: 1px solid rgba(254,218,106,0.1); padding: 3.5rem 3rem 2rem; }
+    .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; }
+    .footer-logo { font-family: var(--display); font-size: 1.4rem; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 0.8rem; }
+    .footer-desc { font-size: 0.78rem; color: var(--silver); line-height: 1.75; font-weight: 300; max-width: 300px; }
+    .footer-col h4 { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-muted); margin-bottom: 1rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .footer-col ul li a { font-size: 0.8rem; color: var(--silver); font-weight: 300; transition: color 0.2s; }
+    .footer-col ul li a:hover { color: var(--gold); }
+    .footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(212,212,220,0.1); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+    .footer-bottom p { font-size: 0.7rem; color: rgba(212,212,220,0.45); }
+    .footer-ack { max-width: 1200px; margin: 1.5rem auto 0; font-size: 0.7rem; color: rgba(212,212,220,0.4); line-height: 1.75; font-weight: 300; }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .speakers-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 820px) {
+      #nav { padding: 0.8rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero, #welcome, #speakers, #sessions, #attend, #reasons, #testimonial, #venue, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .welcome-wrap, .attend-wrap, .reasons-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .welcome-sidebar { position: static; }
+      .speakers-grid { grid-template-columns: repeat(2, 1fr); }
+      .sessions-grid { grid-template-columns: 1fr; }
+      .venue-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .attend-tags { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .speakers-grid { grid-template-columns: 1fr 1fr; }
+    }
+    /* ── Scroll-reveal: CSS-driven, IO triggers .in-view ───────── */
+    .reveal        { opacity: 1; transform: translateY(0); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal-left   { opacity: 1; transform: translateX(0); transition: opacity 0.75s ease, transform 0.75s ease; }
+    .reveal-right  { opacity: 1; transform: translateX(0); transition: opacity 0.75s ease, transform 0.75s ease; }
+    .speaker-card  { transition: opacity 0.55s ease, transform 0.55s ease; }
+    .venue-card    { transition: opacity 0.55s ease, transform 0.55s ease; }
+    .session-card  { transition: opacity 0.6s ease, transform 0.6s ease; }
+    .attend-tag    { transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reason-item   { transition: opacity 0.6s ease, transform 0.6s ease; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-logo">SD Masterclass <span>Series 2026</span></div>
+  <ul class="nav-links">
+    <li><a href="#welcome">Welcome</a></li>
+    <li><a href="#speakers">Speakers</a></li>
+    <li><a href="#sessions">Sessions</a></li>
+    <li><a href="#attend">Attend</a></li>
+    <li><a href="#venue">Venue</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn btn-outline">Brochure</a>
+    <a href="#" class="btn btn-fill">Register</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+<section id="hero">
+  <canvas id="finisher-canvas"></canvas>
+  <div class="hero-inner">
+    <p class="hero-eyebrow" id="hero-eyebrow">Digital Health CRC · La Trobe University · University of Sydney</p>
+
+    <h1 class="hero-title">
+      <span class="line1">
+        <span class="scramble-word" id="scramble-target">Synthetic</span><span class="normal-word"> Health Data</span>
+      </span>
+      <span class="line2">Education &amp; Training<br>Masterclass Series</span>
+    </h1>
+
+    <div class="hero-meta" id="hero-meta">
+      <div class="hero-meta-item">
+        <span class="lbl">Format</span>
+        <span class="val">In-Person Masterclass Series</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="lbl">Melbourne</span>
+        <span class="val">2–3 June 2026</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="lbl">Sydney</span>
+        <span class="val">June 2026</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="lbl">Perth</span>
+        <span class="val">June 2026</span>
+      </div>
+    </div>
+
+    <div class="hero-cta" id="hero-cta">
+      <a href="#" class="btn btn-fill">Register Now</a>
+      <a href="#sessions" class="btn btn-outline">Explore Sessions</a>
+    </div>
+  </div>
+
+  <div class="partner-strip">
+    <span class="lbl">Delivered in partnership with</span>
+    <div class="partner-logos">
+      <span class="partner-pill">Digital Health CRC</span>
+      <span class="partner-pill">La Trobe University</span>
+      <span class="partner-pill">University of Sydney</span>
+      <span class="partner-pill">Swansea University</span>
+      <span class="partner-pill">SAIL Databank</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WELCOME ════════════════════════════════════════════════ -->
+<section id="welcome">
+  <div class="welcome-wrap">
+    <div class="welcome-sidebar reveal-left">
+      <div class="section-eyebrow">Welcome</div>
+      <div class="avatar">
+        <img src="headshots/melanie_haines.jpg" alt="Dr. Melanie Haines" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div class="name">Dr. Melanie Haines</div>
+      <div class="role">Director of Learning &amp; Workforce Transformation</div>
+      <div class="org">Digital Health CRC</div>
+    </div>
+    <div class="welcome-body reveal-right">
+      <div class="section-heading white" style="margin-bottom:0.3rem;">A Message of Welcome</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+      <p>The Synthetic Health Data Education and Training Masterclass Series brings together researchers, policymakers, data custodians, clinicians, and technical experts to build shared capability in the responsible use of synthetic health data. The series responds to growing demand for safe, ethical, and practical ways to accelerate data-driven health innovation while maintaining public trust.</p>
+      <p>Across the program, participants explore how synthetic data can be used to prototype analyses, test pipelines, and support workforce development without exposing sensitive real-world data. The masterclasses focus on understanding when synthetic data is appropriate, and how trade-offs between data utility and privacy can be navigated with confidence.</p>
+      <p>A strong emphasis is placed on governance, ethics, and social licence. Participants engage with contemporary governance frameworks, privacy-preserving analytics, and federated data ecosystem models that enable collaboration across institutions and jurisdictions.</p>
+      <p>Delivered in partnership with leading Australian universities and international experts from Swansea University and the SAIL Databank, the series is designed to strengthen cross-sector dialogue and equip participants with insights they can apply directly in research, policy, and service settings.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SPEAKERS ═══════════════════════════════════════════════ -->
+<section id="speakers">
+  <div class="speakers-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Featured Speakers</div>
+      <div class="section-heading dark">Meet the Experts</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+    </div>
+
+    <div class="speakers-grid">
+
+      <!-- James Boyd -->
+      <div class="speaker-card reveal" data-bio="Professor Boyd is an international expert with over 25 years of experience in population health data linkage and analytics. A pioneer in Privacy-Preserving Record Linkage (PPRL), he co-chairs the Synthetic Data Community of Practice (SynD) under the Digital Health CRC, leading national efforts to establish policy, standards, and technical solutions for the safe and ethical scaling of synthetic health data in Australia.">
+        <div class="speaker-card-img">
+          <img src="headshots/james_boyd.jpg" alt="Professor James Boyd" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">Australian</span>
+          <div class="speaker-name">Prof. James Boyd</div>
+          <div class="speaker-role">Inaugural Chair of Digital Health &amp; Innovation</div>
+          <div class="speaker-org">La Trobe University</div>
+        </div>
+      </div>
+
+      <!-- Melanie Haines -->
+      <div class="speaker-card reveal" data-bio="Dr. Haines is an education specialist and researcher dedicated to building digital literacy and leadership capacity in healthcare. She leads the National Digital Health Capability Action Plan (CAP) in Australia. With a PhD from Lincoln University and over 15 years of experience in regulatory and academic roles, she also manages the popular academic social media brand @WriteThatPhD.">
+        <div class="speaker-card-img">
+          <img src="headshots/melanie_haines.jpg" alt="Dr. Melanie Haines" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">Australian</span>
+          <div class="speaker-name">Dr. Melanie Haines</div>
+          <div class="speaker-role">Director of Learning &amp; Workforce Transformation</div>
+          <div class="speaker-org">Digital Health CRC</div>
+        </div>
+      </div>
+
+      <!-- Keren Pointon -->
+      <div class="speaker-card reveal" data-bio="Keren is a public health professional and Certified Practicing Accountant (CPA) with extensive experience in government strategic committees. She focuses on health improvement change and digital health governance, and is a core contributor to the SynD community, specialising in governance frameworks and the ethical use of synthetic health datasets.">
+        <div class="speaker-card-img">
+          <img src="headshots/keren_pointon.jpg" alt="Keren Pointon" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">Australian</span>
+          <div class="speaker-name">Keren Pointon</div>
+          <div class="speaker-role">Project Manager, SynD Community</div>
+          <div class="speaker-org">DHCRC &amp; QDHeC</div>
+        </div>
+      </div>
+
+      <!-- Ashley Akbari -->
+      <div class="speaker-card reveal" data-bio="Ashley is a Senior Research Manager and Data Scientist for Health Data Research UK (HDR UK). Since 2008, he has been a pillar of the SAIL Databank, championing 'Team Science.' His expertise includes data linkage, epidemiology, and the development of Trusted Research Environments (TREs) to improve public services.">
+        <div class="speaker-card-img">
+          <img src="headshots/ashley_akbari.jpg" alt="Professor Ashley Akbari" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">International</span>
+          <div class="speaker-name">Prof. Ashley Akbari</div>
+          <div class="speaker-role">Professor of Population Data Science Research</div>
+          <div class="speaker-org">Swansea University / SAIL Databank</div>
+        </div>
+      </div>
+
+      <!-- Chris Orton -->
+      <div class="speaker-card reveal" data-bio="Chris is the Technical Lead for the Inflammation and Immunity driver programme at Swansea University. He specialises in navigating fragmented health data landscapes, focusing on data security, access, and linkage, and manages technical solutions for the SAIL Databank and the Secure eResearch Platform (SeRP).">
+        <div class="speaker-card-img">
+          <img src="headshots/chris_orton.jpg" alt="Chris Orton" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">International</span>
+          <div class="speaker-name">Chris Orton</div>
+          <div class="speaker-role">Technical Lead, Population Data Science</div>
+          <div class="speaker-org">Swansea University</div>
+        </div>
+      </div>
+
+      <!-- Simon Thompson -->
+      <div class="speaker-card reveal" data-bio="Simon is a systems architect and the Chief Technology Officer for the Secure eResearch Platform (SeRP) and SAIL Databank. He leads a large team of software developers and is responsible for the technical workstream of numerous international e-research collaborations, including Dementias Platform UK (DPUK).">
+        <div class="speaker-card-img">
+          <img src="headshots/simon_thompson.jpg" alt="Professor Simon Thompson" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">International</span>
+          <div class="speaker-name">Prof. Simon Thompson</div>
+          <div class="speaker-role">Professor of Health Informatics &amp; CTO of SeRP</div>
+          <div class="speaker-org">Swansea University</div>
+        </div>
+      </div>
+
+      <!-- Lewis Hotchkiss -->
+      <div class="speaker-card reveal" data-bio="Lewis's research is at the cutting edge of synthetic health data. He leads the UK Synthetic Data Community Group and focuses on using 3D MRI synthetic data to improve AI models for dementia diagnosis. He is a primary voice in developing consensus frameworks for synthetic data use within Trusted Research Environments.">
+        <div class="speaker-card-img">
+          <img src="headshots/lewis_hotchkiss.jpg" alt="Lewis Hotchkiss" loading="lazy" />
+        </div>
+        <div class="speaker-card-body">
+          <span class="speaker-tag">International</span>
+          <div class="speaker-name">Lewis Hotchkiss</div>
+          <div class="speaker-role">Research Officer &amp; PhD Candidate</div>
+          <div class="speaker-org">Swansea University</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="speakers-cta reveal">
+      <a href="#" class="btn btn-outline" style="border-color:var(--dark);color:var(--dark);">View All Speakers</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHOTO BREAK ════════════════════════════════════════════ -->
+<div class="photo-break">
+  <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1400&q=60" alt="Masterclass participants in discussion" loading="lazy" />
+  <div class="photo-break-overlay">
+    <div class="photo-break-text">Hands-On · Expert-Led · Cross-Sector</div>
+  </div>
+</div>
+
+<!-- ═══ SESSIONS ═══════════════════════════════════════════════ -->
+<section id="sessions">
+  <div class="sessions-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Program</div>
+      <div class="section-heading">Session Highlights</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+    </div>
+
+    <div class="sessions-grid">
+      <div class="session-card reveal">
+        <div class="session-num">01</div>
+        <div class="session-title">Synthetic Health Data Foundations &amp; Governance</div>
+        <p class="session-desc">An introduction to what synthetic health data is (and is not), its appropriate use cases, and the governance, ethics, and social licence considerations required for responsible adoption.</p>
+        <div class="session-contrib">Digital Health CRC leaders · University partners</div>
+      </div>
+      <div class="session-card reveal">
+        <div class="session-num">02</div>
+        <div class="session-title">Synthetic Health Data in Practice</div>
+        <p class="session-desc">A practical exploration of low- and high-fidelity synthetic data, informed by UK and Australian case studies and real-world implementations across health and research settings.</p>
+        <div class="session-contrib">Swansea University · SAIL Databank · Australian collaborators</div>
+      </div>
+      <div class="session-card reveal">
+        <div class="session-num">03</div>
+        <div class="session-title">Privacy-Preserving Analytics &amp; Federated Data Ecosystems</div>
+        <p class="session-desc">A deep dive into federated learning, trusted research environments, and collaboration models that enable analysis without centralising sensitive data across institutions and jurisdictions.</p>
+        <div class="session-contrib">International &amp; Australian technical experts</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WHO SHOULD ATTEND ══════════════════════════════════════ -->
+<section id="attend">
+  <div class="attend-wrap">
+    <div class="attend-intro reveal-left">
+      <div class="section-eyebrow">Audience</div>
+      <div class="section-heading">Who Should Attend</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+      <p>The Masterclass Series brings together professionals from across the health data ecosystem who are ready to build practical capability in synthetic data, privacy, and governance.</p>
+    </div>
+    <div class="attend-tags reveal-right">
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Health &amp; Medical Researchers</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Data Scientists &amp; Analysts</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Health Service Analytics Teams</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Policymakers &amp; Regulators</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Data Custodians &amp; Governance Professionals</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Digital Health Innovators</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Clinicians with Data Interests</span>
+      </div>
+      <div class="attend-tag">
+        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
+        <span class="attend-tag-text">Health Consumers &amp; Consumer Advocates</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ REASONS TO ATTEND ══════════════════════════════════════ -->
+<section id="reasons">
+  <div class="reasons-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Value Propositions</div>
+      <div class="section-heading dark">Reasons to Attend</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+    </div>
+
+    <div class="reasons-layout">
+      <!-- Left: checklist -->
+      <div class="reasons-list reveal-left">
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Build practical capability in synthetic health data through hands-on, facilitated masterclass delivery with international experts.</span>
+        </div>
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Understand privacy and utility trade-offs in real settings, drawing on concrete case studies from the UK and Australia.</span>
+        </div>
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Learn governance frameworks relevant to the Australian context, including ethics, social licence, and regulatory considerations.</span>
+        </div>
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Explore federated analytics and trusted research environment models that enable collaboration without centralising sensitive data.</span>
+        </div>
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Learn from UK and Australian case studies featuring real-world implementations of synthetic data across health and research.</span>
+        </div>
+        <div class="reason-item">
+          <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
+          <span class="reason-text">Strengthen cross-sector collaboration and build a shared language across research, policy, clinical, and data communities.</span>
+        </div>
+      </div>
+
+      <!-- Right: session groups with speaker mini-cards -->
+      <div class="reasons-sessions reveal-right">
+        <div class="reason-session-group">
+          <div class="reason-session-label">Foundations &amp; Governance</div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/melanie_haines.jpg" alt="Dr. Melanie Haines" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Dr. Melanie Haines</div><div class="rsi-role">Director of Learning &amp; Workforce Transformation</div><div class="rsi-org">Digital Health CRC</div></div>
+          </div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/keren_pointon.jpg" alt="Keren Pointon" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Keren Pointon</div><div class="rsi-role">Project Manager, SynD Community</div><div class="rsi-org">DHCRC &amp; QDHeC</div></div>
+          </div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/james_boyd.jpg" alt="Prof. James Boyd" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Prof. James Boyd</div><div class="rsi-role">Inaugural Chair of Digital Health &amp; Innovation</div><div class="rsi-org">La Trobe University</div></div>
+          </div>
+        </div>
+
+        <div class="reason-session-group">
+          <div class="reason-session-label">Synthetic Data in Practice</div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/ashley_akbari.jpg" alt="Prof. Ashley Akbari" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Prof. Ashley Akbari</div><div class="rsi-role">Professor of Population Data Science Research</div><div class="rsi-org">Swansea University / SAIL Databank</div></div>
+          </div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/lewis_hotchkiss.jpg" alt="Lewis Hotchkiss" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Lewis Hotchkiss</div><div class="rsi-role">Research Officer &amp; PhD Candidate</div><div class="rsi-org">Swansea University</div></div>
+          </div>
+        </div>
+
+        <div class="reason-session-group">
+          <div class="reason-session-label">Federated Analytics &amp; TREs</div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/simon_thompson.jpg" alt="Prof. Simon Thompson" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Prof. Simon Thompson</div><div class="rsi-role">Professor of Health Informatics &amp; CTO of SeRP</div><div class="rsi-org">Swansea University</div></div>
+          </div>
+          <div class="reason-speaker-row">
+            <div class="reason-speaker-avatar"><img src="headshots/chris_orton.jpg" alt="Chris Orton" /></div>
+            <div class="reason-speaker-info"><div class="rsi-name">Chris Orton</div><div class="rsi-role">Technical Lead, Population Data Science</div><div class="rsi-org">Swansea University</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIAL ════════════════════════════════════════════ -->
+<section id="testimonial">
+  <div class="testimonial-wrap reveal">
+    <div class="quote-mark">"</div>
+    <p class="quote-text">This masterclass series gave our team a shared vocabulary and a practical framework for thinking about synthetic data — something we had been struggling to articulate for months. The combination of international expertise and Australian context was exactly what we needed.</p>
+    <div class="quote-attr">— Placeholder Participant · Health Data Analytics Team</div>
+  </div>
+</section>
+
+<!-- ═══ VENUE ══════════════════════════════════════════════════ -->
+<section id="venue">
+  <div class="venue-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Locations</div>
+      <div class="section-heading">Venue &amp; Dates</div>
+      <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+    </div>
+
+    <div class="venue-grid">
+      <div class="venue-card reveal">
+        <div class="venue-img">
+          <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1514395462725-fb4566210144?w=600&q=60');"></div>
+          <div class="venue-city-code">MEL</div>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city-name">Melbourne</div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">Tuesday 2 – Wednesday 3 June 2026</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">La Trobe University City Campus, Level 2, 360 Collins Street, Melbourne VIC</span></div>
+        </div>
+      </div>
+
+      <div class="venue-card reveal">
+        <div class="venue-img">
+          <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&q=60');"></div>
+          <div class="venue-city-code">SYD</div>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city-name">Sydney</div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">June 2026 (exact dates TBC)</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">University of Sydney, Michael Spence Building, Sydney NSW</span></div>
+        </div>
+      </div>
+
+      <div class="venue-card reveal">
+        <div class="venue-img">
+          <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=600&q=60');"></div>
+          <div class="venue-city-code">PER</div>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city-name">Perth</div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">June 2026 (exact dates TBC)</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">Venue TBC — part of Synthetic Health Data Week, Perth WA</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">SD Masterclass Series</div>
+      <p class="footer-desc">Synthetic Health Data Education and Training Masterclass Series 2026. Delivered in partnership with Digital Health CRC, La Trobe University, University of Sydney, Swansea University, and the SAIL Databank.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#welcome">Welcome</a></li>
+        <li><a href="#speakers">Speakers</a></li>
+        <li><a href="#sessions">Sessions</a></li>
+        <li><a href="#attend">Who Should Attend</a></li>
+        <li><a href="#venue">Venue &amp; Dates</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:info@digitalhealthcrc.com">info@digitalhealthcrc.com</a></li>
+        <li><a href="#">Register Interest</a></li>
+        <li><a href="#">Download Brochure</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-ack">We acknowledge the Traditional Custodians of the lands on which these events will be held — the Wurundjeri people of the Kulin Nation (Melbourne), the Gadigal people of the Eora Nation (Sydney), and the Whadjuk Noongar people (Perth) — and pay our respects to Elders past, present, and emerging.</div>
+  <div class="footer-bottom">
+    <p>© 2026 Digital Health CRC. All rights reserved.</p>
+    <p>Privacy Policy · Terms &amp; Conditions</p>
+  </div>
+</footer>
+
+<!-- ═══ JAVASCRIPT ══════════════════════════════════════════════ -->
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ── FinisherHeader particle engine ─────────────────────── */
+  class FinisherHeader {
+    constructor(cfg) {
+      this.cfg = cfg;
+      this.canvas = document.getElementById('finisher-canvas');
+      this.ctx    = this.canvas.getContext('2d');
+      this.particles = [];
+      this._raf   = null;
+      this._resize = this._resize.bind(this);
+      this._loop   = this._loop.bind(this);
+      window.addEventListener('resize', this._resize);
+      this._resize();
+      this._build();
+      cancelAnimationFrame(this._raf);
+      this._raf = requestAnimationFrame(this._loop);
+    }
+    update(cfg) { this.cfg = cfg; this._resize(); this._build(); }
+    _resize() {
+      const wrap = this.canvas.parentElement;
+      this.W = wrap.offsetWidth;
+      this.H = wrap.offsetHeight;
+      this.canvas.width  = this.W;
+      this.canvas.height = this.H;
+      this.skewPad = Math.abs(Math.tan(this.cfg.skew * Math.PI / 180) * this.H);
+    }
+    _build() {
+      this.particles = [];
+      for (let i = 0; i < this.cfg.count; i++) this.particles.push(this._spawn(true));
+    }
+    _rand(min, max) { return min + Math.random() * (max - min); }
+    _pick(arr)      { return arr[Math.floor(Math.random() * arr.length)]; }
+    _spawn(randomY = false) {
+      const { size, speed, colors, opacity } = this.cfg;
+      const baseSize = this._rand(size.min, size.max);
+      return {
+        x:          this._rand(-this.skewPad, this.W + this.skewPad),
+        y:          randomY ? this._rand(0, this.H) : this.H + size.max * 2,
+        size: baseSize, baseSize,
+        vx:         this._rand(speed.x.min, speed.x.max) * (Math.random() < 0.5 ? 1 : -1),
+        vy:        -(this._rand(speed.y.min, speed.y.max) || 0.05),
+        color:      this._pick(colors.particles),
+        word:       this._pick(FinisherHeader.WORDS),
+        phase:      this._rand(0, Math.PI * 2),
+        pulseSpeed: this._rand(0.008, 0.02),
+        rotation:   this._rand(-0.1, 0.1),
+        rotSpeed:   this._rand(-0.0005, 0.0005),
+      };
+    }
+    _opacity(p) {
+      const { opacity } = this.cfg;
+      const cx = this.W / 2, cy = this.H / 2;
+      const maxDist = Math.sqrt(cx * cx + cy * cy);
+      const dist = Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2);
+      const t = Math.min(dist / maxDist, 1);
+      return opacity.center + (opacity.edge - opacity.center) * t;
+    }
+    _draw(p) {
+      const ctx = this.ctx;
+      const alpha = this._opacity(p);
+      if (alpha <= 0) return;
+      const hex = p.color.replace('#', '');
+      const r = parseInt(hex.substring(0,2), 16);
+      const g = parseInt(hex.substring(2,4), 16);
+      const b = parseInt(hex.substring(4,6), 16);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle   = `rgb(${r},${g},${b})`;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      const fontSize = Math.max(7, p.size * 0.85);
+      ctx.font = `${fontSize}px 'SF Mono','Fira Mono','Consolas',monospace`;
+      ctx.fillText(p.word, -ctx.measureText(p.word).width / 2, fontSize / 3);
+      ctx.restore();
+    }
+    _loop(ts) {
+      this._raf = requestAnimationFrame(this._loop);
+      const { size, colors, blending, skew } = this.cfg;
+      const ctx = this.ctx;
+      const W = this.W, H = this.H;
+      ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      ctx.transform(1, 0, Math.tan(skew * Math.PI / 180), 1, 0, 0);
+      ctx.translate(-W / 2, -H / 2);
+      ctx.fillStyle = colors.background;
+      ctx.fillRect(-this.skewPad * 2, 0, W + this.skewPad * 4, H);
+      ctx.globalCompositeOperation = blending || 'source-over';
+      for (let i = 0; i < this.particles.length; i++) {
+        const p = this.particles[i];
+        p.phase += p.pulseSpeed;
+        p.size   = p.baseSize + Math.sin(p.phase) * (p.baseSize * size.pulse);
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+        if (p.y < -size.max * 2) this.particles[i] = this._spawn(false);
+        const pad = this.skewPad + size.max;
+        if (p.x > W + pad) p.x = -pad;
+        if (p.x < -pad)    p.x =  W + pad;
+        this._draw(p);
+      }
+      ctx.restore();
+    }
+  }
+  FinisherHeader.WORDS = [
+    'patient_id','date_of_birth','gender','diagnosis_code','medication_name',
+    'bp_systolic','heart_rate','lab_result_value','encounter_date','provider_id',
+    'patient_name','ethnicity','race','marital_status','postal_code',
+    'bp_diastolic','respiratory_rate','body_temperature','oxygen_saturation',
+    'weight_kg','height_cm','bmi','lab_test_name','lab_unit',
+    'medication_dosage','medication_route','frequency','prescription_start_date',
+    'prescription_end_date','allergy_allergen','allergy_severity',
+    'immunization_type','immunization_date','smoking_status','procedure_code',
+    'procedure_date','admission_type','discharge_status','insurance_provider',
+    'policy_number','synthetic_id','privacy_budget','epsilon_value',
+    'fidelity_score','utility_metric','k_anonymity','l_diversity',
+    'differential_privacy','federated_node','data_custodian'
+  ];
+
+  /* Dark Horse config for FinisherHeader */
+  const finisherCfg = {
+    count: 90,
+    size:   { min: 8, max: 17, pulse: 0.12 },
+    speed:  { x: { min: 0, max: 0.25 }, y: { min: 0.03, max: 0.12 } },
+    colors: {
+      background: '#1d1e22',
+      particles:  ['#feda6a','#c9a84c','#d4d4dc','#393f4d','#f5f4f0']
+    },
+    blending: 'screen',
+    opacity:  { center: 0, edge: 0.38 },
+    skew: -1.5,
+  };
+  new FinisherHeader(finisherCfg);
+
+  /* ── Scramble: 1 second, all letters simultaneously ─────────── */
+  function scramble(el, finalText, duration) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const totalFrames = Math.round(duration * 60);
+    // All letters scramble together, then all resolve together at ~65% through
+    const resolveStart = Math.round(totalFrames * 0.55);
+    let frame = 0;
+
+    function rnd() { return chars[Math.floor(Math.random() * chars.length)]; }
+
+    function tick() {
+      frame++;
+      if (frame < resolveStart) {
+        // Pure scramble phase — every character randomises every frame
+        el.textContent = Array.from(finalText).map(c => c === ' ' ? ' ' : rnd()).join('');
+      } else {
+        // Resolve phase — all letters snap to final simultaneously based on eased progress
+        const t = (frame - resolveStart) / (totalFrames - resolveStart);
+        const eased = t * t * (3 - 2 * t); // smoothstep
+        if (eased >= 1) { el.textContent = finalText; return; }
+        // Stagger each character slightly around the resolve point
+        let out = '';
+        for (let i = 0; i < finalText.length; i++) {
+          const charT = (eased - i * 0.04);
+          out += charT >= 1 ? finalText[i] : (finalText[i] === ' ' ? ' ' : rnd());
+        }
+        el.textContent = out;
+      }
+      if (frame < totalFrames) requestAnimationFrame(tick);
+      else el.textContent = finalText;
+    }
+
+    el.textContent = Array.from(finalText).map(c => c === ' ' ? ' ' : rnd()).join('');
+    requestAnimationFrame(tick);
+  }
+
+  /* ── Hero entrance ────────────────────────────────────────── */
+  window.addEventListener('load', () => {
+    // Set initial hidden states
+    gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 0, y: 20 });
+
+    const tl = gsap.timeline({ delay: 0.3 });
+    tl.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' })
+      .add(() => scramble(document.getElementById('scramble-target'), 'Synthetic', 1.0), '-=0.05')
+      .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.8')
+      .to('#hero-meta', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+      .to('#hero-cta', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '-=0.25');
+
+    // Safety fallback: ensure all hero content visible after 4s regardless
+    setTimeout(() => {
+      gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 1, y: 0 });
+    }, 4000);
+  }); // end window load
+
+  /* ── GSAP Pinned Panels with Overscroll ─────────────────────────────────── */
+  // Each section slides up as it enters the viewport.
+  // Only sections that are NOT already in the viewport get the y:40 starting offset.
+  const pinnedSections = ['#welcome', '#speakers', '#sessions', '#attend', '#reasons', '#testimonial', '#venue'];
+  pinnedSections.forEach((sel, i) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.style.position = 'relative';
+    el.style.zIndex   = 10 + i;
+    el.style.willChange = 'transform';
+    const rect = el.getBoundingClientRect();
+    const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    if (!alreadyVisible) {
+      gsap.set(el, { y: 40 });
+    }
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 95%',
+      end:   'top 30%',
+      onEnter: () => gsap.to(el, { y: 0, duration: 0.7, ease: 'power3.out', overwrite: 'auto' }),
+      onEnterBack: () => gsap.to(el, { y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' }),
+    });
+  });
+
+  /* ── IntersectionObserver-based scroll reveals ─────────────────────────── */
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .speaker-card, .venue-card, .session-card, .attend-tag, .reason-item').forEach(el => {
+    revealObs.observe(el);
+  });
+
+  /* ── Navbar compact on scroll ─────────────────────────────────────────── */
+  ScrollTrigger.create({
+    start: 'top -60',
+    onUpdate(self) {
+      document.getElementById('nav').style.padding =
+        self.direction === 1 ? '0.55rem 3rem' : '1rem 3rem';
+    },
+  });
+
+  /* ── Parallax on photo break ────────────────────────────────────────────── */
+  gsap.to('.photo-break img', {
+    scrollTrigger: { trigger: '.photo-break', start: 'top bottom', end: 'bottom top', scrub: true },
+    y: 60, ease: 'none',
+  });
+</script>
+</body>
+</html>
