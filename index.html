@@ -1115,7 +1115,7 @@ new FinisherHeader({
 
 /* ══ Scramble: setInterval-based so it works in background tabs ══════════════ */
 function scramble(el, finalText, duration) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = 'ACDEGHJKLNOPRSTUVYZ';
   const fps = 30;
   const totalFrames = Math.round(duration * fps);
   const resolveStart = Math.round(totalFrames * 0.55);
