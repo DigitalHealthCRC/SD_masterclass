@@ -161,9 +161,9 @@
       transition: border-color 0.2s, color 0.2s; text-align: center;
     }
     .partner-pill:hover { border-color: var(--gold); color: var(--gold); }
-    .partner-pill img, .partner-pill object { height: 32px; width: auto; max-width: 110px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.85; transition: opacity 0.2s; }
+    .partner-pill img, .partner-pill object { height: 52px; width: auto; max-width: 140px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.85; transition: opacity 0.2s; }
     .partner-pill:hover img, .partner-pill:hover object { opacity: 1; filter: brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
-    .partner-pill img.logo-colour { filter: none; opacity: 0.9; }
+    .partner-pill img.logo-colour { filter: none; opacity: 0.9; height: 52px; max-width: 140px; }
     .partner-pill:hover img.logo-colour { filter: none; opacity: 1; }
     .partner-pill .pill-name { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
 
@@ -515,11 +515,11 @@
         <span class="pill-name">Digital Health CRC</span>
       </span>
       <span class="partner-pill">
-        <img src="logos/latrobe_white.svg" alt="La Trobe University" loading="lazy">
+        <img src="logos/latrobe_white.svg" alt="La Trobe University" loading="lazy" class="logo-colour">
         <span class="pill-name">La Trobe University</span>
       </span>
       <span class="partner-pill">
-        <img src="logos/usyd_white.svg" alt="University of Sydney" loading="lazy">
+        <img src="logos/usyd_white.svg" alt="University of Sydney" loading="lazy" class="logo-colour">
         <span class="pill-name">University of Sydney</span>
       </span>
       <span class="partner-pill">
