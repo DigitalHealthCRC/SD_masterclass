@@ -151,7 +151,11 @@
     /* Partner strip */
     .partner-strip {
       position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
-      padding: 1.2rem 3rem; display: flex; align-items: flex-end; gap: 1.2rem; flex-wrap: wrap;
+      padding: 1.2rem 3rem;
+    }
+    .partner-strip-inner {
+      max-width: 1200px; margin: 0 auto; width: 100%;
+      display: flex; align-items: flex-end; gap: 1.2rem; flex-wrap: wrap;
     }
     .partner-strip .lbl { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-muted); white-space: nowrap; align-self: flex-end; padding-bottom: 0.35rem; }
     .partner-logos { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; }
@@ -569,6 +573,7 @@
   </div>
 
   <div class="partner-strip">
+    <div class="partner-strip-inner">
     <span class="lbl">Delivered in partnership with</span>
     <div class="partner-logos">
       <a href="https://www.digitalhealthcrc.com" target="_blank" rel="noopener" class="partner-pill">
@@ -591,6 +596,7 @@
         <img src="logos/sail.png" alt="SAIL Databank" loading="lazy" class="logo-lg">
         <span class="pill-name">SAIL Databank</span>
       </a>
+    </div>
     </div>
   </div>
 </section>
