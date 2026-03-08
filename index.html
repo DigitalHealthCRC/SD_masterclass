@@ -366,14 +366,14 @@
     .reason-speaker-info .rsi-org  { font-size: 0.7rem; font-weight: 700; color: var(--dark); }
 
     /* ─── TESTIMONIAL ───────────────────────────────────────── */
-    #testimonial { background: #020b16; padding: 7rem 3rem; text-align: center; position: relative; overflow: hidden; }
+    #testimonial { background: #020b16; padding: 0; min-height: 90vh; text-align: center; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
     #testimonial-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
     /* Scanlines overlay on testimonial */
     #testimonial::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 1; }
-    /* Radial vignette on testimonial */
-    #testimonial::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 30%, rgba(2,11,22,0.82) 100%); pointer-events: none; z-index: 2; }
-    .testimonial-wrap { max-width: 820px; margin: 0 auto; position: relative; z-index: 3; }
-    .quote-mark { font-family: var(--display); font-size: 9rem; color: var(--gold); line-height: 0.6; opacity: 0.45; margin-bottom: 1.5rem; }
+    /* Radial vignette + bottom fade on testimonial */
+    #testimonial::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 30%, rgba(2,11,22,0.82) 100%), linear-gradient(to bottom, transparent 45%, rgba(2,11,22,0.92) 75%, rgba(2,11,22,1) 100%); pointer-events: none; z-index: 2; }
+    .testimonial-wrap { max-width: 820px; margin: 0 auto; position: relative; z-index: 3; padding: 4rem 3rem 5rem; width: 100%; }
+    .quote-mark { display: none; }
     .quote-text { font-size: clamp(1rem, 2.2vw, 1.4rem); font-weight: 300; font-style: italic; line-height: 1.8; color: var(--off-white); margin-bottom: 2rem; text-shadow: 0 2px 20px rgba(2,11,22,0.9); }
     .quote-attr { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-muted); }
 
