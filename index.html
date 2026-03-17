@@ -1385,7 +1385,9 @@ ScrollTrigger.create({
     document.getElementById('nav').style.padding =
       self.direction === 1 ? '0.55rem 3rem' : '1rem 3rem';
   },
-}/* ══ Parallax on photo break ════════════════════════════════════════════════════════════════════════════════════ */
+});
+
+/* ══ Parallax on photo break ════════════════════════════════════════════════════════════════════════════════════ */
 gsap.to('.photo-break img', {
   scrollTrigger: { trigger: '.photo-break', start: 'top bottom', end: 'bottom top', scrub: true },
   y: 60, ease: 'none',
