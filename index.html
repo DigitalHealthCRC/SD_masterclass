@@ -511,6 +511,129 @@
     .session-card  { transition: opacity 0.6s ease, transform 0.6s ease; }
     .attend-tag    { transition: opacity 0.5s ease, transform 0.5s ease; }
     .reason-item   { transition: opacity 0.6s ease, transform 0.6s ease; }
+
+    /* ─── SPEAKER BIO MODAL ────────────────────────────────────── */
+    .bio-modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(10,10,14,0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .bio-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .bio-modal {
+      background: var(--charcoal); border: 1px solid rgba(254,218,106,0.2);
+      border-radius: 10px; max-width: 680px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      transform: translateY(24px); transition: transform 0.35s ease;
+      position: relative;
+    }
+    .bio-modal-overlay.open .bio-modal { transform: translateY(0); }
+    .bio-modal-header {
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      padding: 2rem 2rem 1.2rem;
+      border-bottom: 1px solid rgba(254,218,106,0.1);
+    }
+    .bio-modal-avatar {
+      width: 90px; height: 90px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid var(--gold); overflow: hidden; background: var(--grey);
+    }
+    .bio-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .bio-modal-meta { flex: 1; }
+    .bio-modal-tag {
+      display: inline-block; font-size: 0.55rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; padding: 0.18rem 0.55rem; border-radius: 2px;
+      background: rgba(254,218,106,0.12); color: var(--gold); margin-bottom: 0.5rem;
+    }
+    .bio-modal-name {
+      font-family: var(--display); font-size: 1.6rem; letter-spacing: 0.04em;
+      color: var(--gold); line-height: 1.1; margin-bottom: 0.3rem;
+    }
+    .bio-modal-role { font-size: 0.8rem; color: var(--silver); font-weight: 300; line-height: 1.5; }
+    .bio-modal-org  { font-size: 0.75rem; font-weight: 700; color: var(--gold-muted); margin-top: 0.2rem; }
+    .bio-modal-body {
+      padding: 1.5rem 2rem 2rem;
+      font-size: 0.88rem; line-height: 1.85; color: var(--silver); font-weight: 300;
+    }
+    .bio-modal-body p { margin-bottom: 1rem; }
+    .bio-modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(254,218,106,0.1); border: 1px solid rgba(254,218,106,0.2);
+      color: var(--gold); font-size: 1.1rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .bio-modal-close:hover { background: rgba(254,218,106,0.25); }
+    /* Click hint on speaker card */
+    .speaker-card-hint {
+      position: absolute; bottom: 0.6rem; right: 0.8rem; z-index: 2;
+      font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold-muted); opacity: 0; transition: opacity 0.3s;
+    }
+    .speaker-card:hover .speaker-card-hint { opacity: 1; }
+
+    /* ─── SESSIONS DAYS LAYOUT ─────────────────────────────────── */
+    .sessions-intro {
+      font-size: 0.95rem; line-height: 1.8; color: var(--silver); font-weight: 300;
+      max-width: 760px; margin-top: 1rem;
+    }
+    .sessions-days {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
+    }
+    @media (max-width: 768px) { .sessions-days { grid-template-columns: 1fr; } }
+    .session-day {
+      background: var(--charcoal); border-radius: 8px; overflow: hidden;
+      border: 1px solid rgba(254,218,106,0.1);
+      transition: border-color 0.3s;
+    }
+    .session-day:hover { border-color: rgba(254,218,106,0.35); }
+    .session-day-header {
+      background: rgba(254,218,106,0.05); border-bottom: 1px solid rgba(254,218,106,0.1);
+      padding: 1.8rem 2rem 1.4rem;
+    }
+    .session-day-num {
+      font-family: var(--display); font-size: 3rem; color: rgba(254,218,106,0.15);
+      line-height: 1; margin-bottom: 0.3rem;
+    }
+    .session-day-focus {
+      font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.03em;
+      color: var(--gold); line-height: 1.2; margin-bottom: 0.6rem;
+    }
+    .session-day-sub {
+      font-size: 0.82rem; color: var(--silver); font-weight: 300; line-height: 1.6;
+    }
+    .session-bullets {
+      list-style: none; padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 0;
+    }
+    .session-bullets li {
+      font-size: 0.85rem; line-height: 1.65; color: var(--silver); font-weight: 300;
+      padding: 0.75rem 0 0.75rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+    }
+    .session-bullets li:last-child { border-bottom: none; }
+    .session-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 1.1rem;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold); opacity: 0.6;
+    }
+
+    /* ─── ATTEND TAG EXPANDED ──────────────────────────────────── */
+    .attend-tag-expanded {
+      flex-direction: row; align-items: flex-start; gap: 0.9rem;
+      padding: 1.1rem 1.2rem;
+    }
+    .attend-tag-expanded .attend-tag-icon { margin-top: 0.1rem; flex-shrink: 0; }
+    .attend-tag-text { display: block; font-size: 0.88rem; font-weight: 600; color: var(--gold); margin-bottom: 0.25rem; }
+    .attend-tag-desc { display: block; font-size: 0.78rem; color: var(--silver); font-weight: 300; line-height: 1.6; }
+
+    /* ─── VENUE CTA LINK ───────────────────────────────────────── */
+    .venue-card { display: block; text-decoration: none; color: inherit; }
+    .venue-cta {
+      margin-top: 1rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold); transition: letter-spacing 0.2s;
+    }
+    .venue-card:hover .venue-cta { letter-spacing: 0.15em; }
   </style>
 </head>
 <body>
@@ -527,7 +650,7 @@
   </ul>
   <div class="nav-cta">
     <a href="#" class="btn btn-outline">Brochure</a>
-    <a href="#" class="btn btn-fill">Register</a>
+    <a href="https://events.humanitix.com/synd-masterclass-sydney" target="_blank" rel="noopener" class="btn btn-fill">Register</a>
   </div>
 </nav>
 
@@ -557,17 +680,17 @@
       <div class="hero-divider"></div>
       <div class="hero-meta-item">
         <span class="lbl">Sydney</span>
-        <span class="val">June 2026</span>
+        <span class="val">9–10 June 2026</span>
       </div>
       <div class="hero-divider"></div>
       <div class="hero-meta-item">
         <span class="lbl">Perth</span>
-        <span class="val">June 2026</span>
+        <span class="val">16–17 June 2026</span>
       </div>
     </div>
 
     <div class="hero-cta" id="hero-cta">
-      <a href="#" class="btn btn-fill">Register Now</a>
+      <a href="https://events.humanitix.com/synd-masterclass-sydney" target="_blank" rel="noopener" class="btn btn-fill">Register Now</a>
       <a href="#sessions" class="btn btn-outline">Explore Sessions</a>
     </div>
   </div>
@@ -636,10 +759,11 @@
     <div class="speakers-grid">
 
       <!-- James Boyd -->
-      <div class="speaker-card reveal" data-bio="Professor Boyd is an international expert with over 25 years of experience in population health data linkage and analytics. A pioneer in Privacy-Preserving Record Linkage (PPRL), he co-chairs the Synthetic Data Community of Practice (SynD) under the Digital Health CRC, leading national efforts to establish policy, standards, and technical solutions for the safe and ethical scaling of synthetic health data in Australia.">
+      <div class="speaker-card reveal" data-bio="Professor James Boyd is the inaugural Chair of Digital Health and Innovation at La Trobe University, where he leads the University&#39;s strategy in research, education, and health system transformation through digital technology and data-driven solutions. His work focuses on addressing fragmentation in health information, advancing integrated models of care, and supporting evidence-based improvements in patient outcomes and system efficiency.&lt;br&gt;&lt;br&gt;With over 25 years&#39; experience in population health data linkage and analytics, Professor Boyd is an international expert in using large-scale, linked administrative health datasets to generate actionable intelligence for policy, clinical practice, and health service evaluation. He was a pioneer in the development of Privacy-Preserving Record Linkage (PPRL), enabling secure, cross-jurisdictional data integration to support chronic disease surveillance, service optimisation, and preventive health initiatives.&lt;br&gt;&lt;br&gt;Professor Boyd co-chairs the Synthetic Data Community of Practice (SynD) under the Digital Health CRC, a national initiative advancing the safe and effective use of synthetic health data to accelerate research, education, and digital health innovation while preserving privacy and governance standards.">
         <div class="speaker-card-img">
           <img src="headshots/james_boyd.jpg" alt="Professor James Boyd" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">Australian</span>
           <div class="speaker-name">Prof. James Boyd</div>
@@ -653,6 +777,7 @@
         <div class="speaker-card-img">
           <img src="headshots/melanie_haines.jpg" alt="Dr. Melanie Haines" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">Australian</span>
           <div class="speaker-name">Dr. Melanie Haines</div>
@@ -666,6 +791,7 @@
         <div class="speaker-card-img">
           <img src="headshots/peta_collins.jpg" alt="Peta Collins" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">Australian</span>
           <div class="speaker-name">Peta Collins</div>
@@ -679,6 +805,7 @@
         <div class="speaker-card-img">
           <img src="headshots/keren_pointon.jpg" alt="Keren Pointon" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">Australian</span>
           <div class="speaker-name">Keren Pointon</div>
@@ -688,10 +815,11 @@
       </div>
 
       <!-- Ashley Akbari -->
-      <div class="speaker-card reveal" data-bio="Ashley is a Senior Research Manager and Data Scientist for Health Data Research UK (HDR UK). Since 2008, he has been a pillar of the SAIL Databank, championing 'Team Science.' His expertise includes data linkage, epidemiology, and the development of Trusted Research Environments (TREs) to improve public services.">
+      <div class="speaker-card reveal" data-bio="Ashley is a Professor of Population Data Science Research at Swansea University. Based at Swansea University since 2008, Ashley plays a substantive role in major research programmes utilising population-scale data across the UK and collaborates with colleagues internationally.&lt;br&gt;&lt;br&gt;Ashley is the Head of the User and Data Support Services (UDSS) team &amp;amp; Research Innovation at the Secure Anonymised Information Linkage (SAIL) Databank, and is a Senior Management Board member of the SAIL Databank and the Secure eResearch Platform (SeRP). Ashley is the lead for the SAFER (SAIL Advancing Federated Exploration and Readiness) project, which has assessed the SAIL Databank&#39;s readiness to be a TRE as part of a federated network.&lt;br&gt;&lt;br&gt;Championing Team Science, Ashley leads and collaborates with multidisciplinary, multi-organisational groups to develop and deliver research that promotes the translation of research outcomes into policy across academia, health and care services, and government. As the Director of the Population Data Science Internship Programme, Ashley promotes opportunities for early-career researchers and students to develop their technical skills.">
         <div class="speaker-card-img">
           <img src="headshots/ashley_akbari.jpg" alt="Professor Ashley Akbari" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">International</span>
           <div class="speaker-name">Prof. Ashley Akbari</div>
@@ -701,10 +829,11 @@
       </div>
 
       <!-- Chris Orton -->
-      <div class="speaker-card reveal" data-bio="Chris is the Technical Lead for the Inflammation and Immunity driver programme at Swansea University. He specialises in navigating fragmented health data landscapes, focusing on data security, access, and linkage, and manages technical solutions for the SAIL Databank and the Secure eResearch Platform (SeRP).">
+      <div class="speaker-card reveal" data-bio="Chris Orton is Head of Business Development for the Secure eResearch Platform (SeRP) and SAIL Databank at Swansea University. Chris&#39; primary role is to drive use of the unique research infrastructure and data assets which both SeRP and SAIL have developed over the last 10+ years, and is responsible for managing strategic relationships with a wide-ranging customer and collaborator portfolio across the world.&lt;br&gt;&lt;br&gt;Chris has over 10 years&#39; experience in developing and operating trusted research environments (TREs) within the UK and in supporting international deployment of research infrastructure. He is Technical Lead for Population Research UK (PRUK) and holds a similar position for the Health Data Research UK (HDR UK) Inflammation and Immunity Driver Programme.&lt;br&gt;&lt;br&gt;Chris led a recent synthetic data-based workshop as part of the Administrative Data Research UK conference in September 2025, and is currently exploring the next steps for synthetic data across training, development, and federation pathways.">
         <div class="speaker-card-img">
           <img src="headshots/chris_orton.jpg" alt="Chris Orton" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">International</span>
           <div class="speaker-name">Chris Orton</div>
@@ -714,10 +843,11 @@
       </div>
 
       <!-- Simon Thompson -->
-      <div class="speaker-card reveal" data-bio="Simon is a systems architect and the Chief Technology Officer for the Secure eResearch Platform (SeRP) and SAIL Databank. He leads a large team of software developers and is responsible for the technical workstream of numerous international e-research collaborations, including Dementias Platform UK (DPUK).">
+      <div class="speaker-card reveal" data-bio="Simon Thompson is a Professor of Health Informatics and the senior technical academic for all data research investments in Swansea University. He is a systems architect with many years&#39; experience in the NHS and academia, and is the Chief Technology Officer of a large team of talented and diversely skilled software developers, data innovation specialists and enterprise architecture engineers.&lt;br&gt;&lt;br&gt;Simon leads the innovation, design, development and implementation of all SeRP technical system developments. He is responsible for delivering the technical workstream for Swansea University as part of multiple UK networks of health and administrative data research centres of excellence and international collaborations.">
         <div class="speaker-card-img">
           <img src="headshots/simon_thompson.jpg" alt="Professor Simon Thompson" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">International</span>
           <div class="speaker-name">Prof. Simon Thompson</div>
@@ -727,10 +857,11 @@
       </div>
 
       <!-- Lewis Hotchkiss -->
-      <div class="speaker-card reveal" data-bio="Lewis's research is at the cutting edge of synthetic health data. He leads the UK Synthetic Data Community Group and focuses on using 3D MRI synthetic data to improve AI models for dementia diagnosis. He is a primary voice in developing consensus frameworks for synthetic data use within Trusted Research Environments.">
+      <div class="speaker-card reveal" data-bio="Lewis Hotchkiss is Senior Research Officer at Dementias Platform UK Data Portal and SeRP where he leads research on Responsible AI, Synthetic Data, Neuroimaging and Federation in the context of sensitive data research and Trusted Research Environments (TREs).&lt;br&gt;&lt;br&gt;Lewis currently leads the UK Synthetic Data Community Group which ran a series of stakeholder workshops to develop governance, tools and standards for synthetic data in the UK. His work spans governance and technological developments to advance the capabilities of TREs for advanced data research.">
         <div class="speaker-card-img">
           <img src="headshots/lewis_hotchkiss.jpg" alt="Lewis Hotchkiss" loading="lazy" />
         </div>
+        <span class="speaker-card-hint">View Bio</span>
         <div class="speaker-card-body">
           <span class="speaker-tag">International</span>
           <div class="speaker-name">Lewis Hotchkiss</div>
@@ -760,29 +891,47 @@
   <div class="sessions-wrap">
     <div class="reveal">
       <div class="section-eyebrow">Program</div>
-      <div class="section-heading">Session Highlights</div>
+      <div class="section-heading">Two-Day Program Outline</div>
       <div class="colour-rule"><span class="cr-1"></span><span class="cr-2"></span><span class="cr-3"></span><span class="cr-4"></span><span class="cr-5"></span></div>
+      <p class="sessions-intro">Join national and international experts for a two-day masterclass designed to accelerate Australia's capability in synthetic health data, privacy-preserving analytics, and federated data ecosystems.</p>
     </div>
 
-    <div class="sessions-grid">
-      <div class="session-card reveal">
-        <div class="session-num">01</div>
-        <div class="session-title">Synthetic Health Data Foundations &amp; Governance</div>
-        <p class="session-desc">An introduction to what synthetic health data is (and is not), its appropriate use cases, and the governance, ethics, and social licence considerations required for responsible adoption.</p>
-        <div class="session-contrib">Digital Health CRC leaders · University partners</div>
+    <div class="sessions-days">
+
+      <!-- Day 1 -->
+      <div class="session-day reveal">
+        <div class="session-day-header">
+          <div class="session-day-num">Day 01</div>
+          <div class="session-day-focus">Foundations, Ethics &amp; Readiness</div>
+          <p class="session-day-sub">Building a clear, shared understanding of what synthetic health data is — and how to use it responsibly.</p>
+        </div>
+        <ul class="session-bullets">
+          <li>Develop a clear, shared understanding of what synthetic health data is (and is not), and where it adds value.</li>
+          <li>Distinguish between low and high-fidelity synthetic data, including their risks, benefits, and appropriate use cases.</li>
+          <li>Understand the technical foundations of synthetic data generation, validation, and fitness-for-purpose assessment.</li>
+          <li>Examine ethical, governance, and regulatory considerations, with a strong focus on transparency, accountability, and public trust.</li>
+          <li>Learn about local Australian synthetic health data initiatives, progress to date, and lessons learned from early implementation.</li>
+          <li>Engage in cross-sector discussion to assess organisational readiness for adopting synthetic health data in practice.</li>
+        </ul>
       </div>
-      <div class="session-card reveal">
-        <div class="session-num">02</div>
-        <div class="session-title">Synthetic Health Data in Practice</div>
-        <p class="session-desc">A practical exploration of low- and high-fidelity synthetic data, informed by UK and Australian case studies and real-world implementations across health and research settings.</p>
-        <div class="session-contrib">Swansea University · SAIL Databank · Australian collaborators</div>
+
+      <!-- Day 2 -->
+      <div class="session-day reveal">
+        <div class="session-day-header">
+          <div class="session-day-num">Day 02</div>
+          <div class="session-day-focus">Applying Synthetic Data Safely at Scale</div>
+          <p class="session-day-sub">Technical hands-on, expert demonstrations, and social licence pathways for real-world implementation.</p>
+        </div>
+        <ul class="session-bullets">
+          <li>Understand how synthetic data supports federated analytics, Trusted Research Environments, and privacy-preserving computation at scale.</li>
+          <li>Gain hands-on technical experience or participate in expert-led demonstrations of synthetic data generation, fidelity evaluation, and applied modelling using a realistic health use case.</li>
+          <li>Explore how consumer expectations, policy considerations, and governance frameworks shape responsible and trustworthy synthetic data use.</li>
+          <li>Understand how Common Data Models (e.g. OMOP) enable interoperability and multisite analysis, supported by synthetic data.</li>
+          <li>Synthesise technical and social perspectives to identify practical, trustworthy pathways to scale synthetic health data initiatives.</li>
+          <li>Articulate what &ldquo;good&rdquo; implementation looks like for Australia over the next 12&ndash;24 months and identify concrete next steps for collaboration.</li>
+        </ul>
       </div>
-      <div class="session-card reveal">
-        <div class="session-num">03</div>
-        <div class="session-title">Privacy-Preserving Analytics &amp; Federated Data Ecosystems</div>
-        <p class="session-desc">A deep dive into federated learning, trusted research environments, and collaboration models that enable analysis without centralising sensitive data across institutions and jurisdictions.</p>
-        <div class="session-contrib">International &amp; Australian technical experts</div>
-      </div>
+
     </div>
   </div>
 </section>
@@ -797,37 +946,40 @@
       <p>The Masterclass Series brings together professionals from across the health data ecosystem who are ready to build practical capability in synthetic data, privacy, and governance.</p>
     </div>
     <div class="attend-tags reveal-right">
-      <div class="attend-tag">
+      <div class="attend-tag attend-tag-expanded">
         <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Health &amp; Medical Researchers</span>
+        <div>
+          <span class="attend-tag-text">Researchers &amp; ECRs</span>
+          <span class="attend-tag-desc">Prototype analyses, test pipelines, and gain hands-on experience using synthetic data and federated analytics before ethics and data access approvals are in place.</span>
+        </div>
       </div>
-      <div class="attend-tag">
+      <div class="attend-tag attend-tag-expanded">
         <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Data Scientists &amp; Analysts</span>
+        <div>
+          <span class="attend-tag-text">HDR Students</span>
+          <span class="attend-tag-desc">Get hands-on with realistic synthetic health datasets while learning the foundations of data synthesis, governance, and ethics &mdash; no prior experience or patient data required.</span>
+        </div>
       </div>
-      <div class="attend-tag">
+      <div class="attend-tag attend-tag-expanded">
         <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Health Service Analytics Teams</span>
+        <div>
+          <span class="attend-tag-text">Health Services, Policy &amp; Government</span>
+          <span class="attend-tag-desc">Explore practical pathways for enabling data-driven innovation while protecting privacy, public trust, and regulatory compliance.</span>
+        </div>
       </div>
-      <div class="attend-tag">
+      <div class="attend-tag attend-tag-expanded">
         <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Policymakers &amp; Regulators</span>
+        <div>
+          <span class="attend-tag-text">Digital Health &amp; Data Innovation Industry</span>
+          <span class="attend-tag-desc">Test models, products and AI safely using synthetic data environments without impacting live systems or sensitive health data.</span>
+        </div>
       </div>
-      <div class="attend-tag">
+      <div class="attend-tag attend-tag-expanded" style="grid-column: 1 / -1;">
         <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Data Custodians &amp; Governance Professionals</span>
-      </div>
-      <div class="attend-tag">
-        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Digital Health Innovators</span>
-      </div>
-      <div class="attend-tag">
-        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Clinicians with Data Interests</span>
-      </div>
-      <div class="attend-tag">
-        <div class="attend-tag-icon"><svg viewBox="0 0 16 16"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 13c0-2.8 2.2-5 5-5s5 2.2 5 5H3z"/></svg></div>
-        <span class="attend-tag-text">Health Consumers &amp; Consumer Advocates</span>
+        <div>
+          <span class="attend-tag-text">Health Consumers &amp; Patient Advocates</span>
+          <span class="attend-tag-desc">Understand what synthetic health data is (and isn&rsquo;t), how privacy risks are minimised, and how communities can shape responsible, trusted data innovation.</span>
+        </div>
       </div>
     </div>
   </div>
@@ -946,46 +1098,71 @@
     </div>
 
     <div class="venue-grid">
-      <div class="venue-card reveal">
+      <a href="melbourne.html" class="venue-card reveal">
         <div class="venue-img">
           <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1514395462725-fb4566210144?w=600&q=60');"></div>
           <div class="venue-city-code">MEL</div>
         </div>
         <div class="venue-body">
           <div class="venue-city-name">Melbourne</div>
-          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">Tuesday 2 – Wednesday 3 June 2026</span></div>
-          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">La Trobe University City Campus, Level 2, 360 Collins Street, Melbourne VIC</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">Tuesday 2 &ndash; Wednesday 3 June 2026</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">La Trobe University Digital Innovation Hub, Bundoora Campus, Melbourne VIC</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Hours</span><span class="venue-row-val">9am &ndash; 4pm both days</span></div>
+          <div class="venue-cta">View Details &amp; Register &rarr;</div>
         </div>
-      </div>
+      </a>
 
-      <div class="venue-card reveal">
+      <a href="sydney.html" class="venue-card reveal">
         <div class="venue-img">
           <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&q=60');"></div>
           <div class="venue-city-code">SYD</div>
         </div>
         <div class="venue-body">
           <div class="venue-city-name">Sydney</div>
-          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">June 2026 (exact dates TBC)</span></div>
-          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">University of Sydney, Michael Spence Building, Sydney NSW</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">Tuesday 9 &ndash; Wednesday 10 June 2026</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">The Sutherland Room, Level 4, Holme Building, Science Road, University of Sydney NSW</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Hours</span><span class="venue-row-val">9am &ndash; 4pm both days</span></div>
+          <div class="venue-cta">View Details &amp; Register &rarr;</div>
         </div>
-      </div>
+      </a>
 
-      <div class="venue-card reveal">
+      <a href="perth.html" class="venue-card reveal">
         <div class="venue-img">
           <div class="venue-img-bg" style="background-image:url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=600&q=60');"></div>
           <div class="venue-city-code">PER</div>
         </div>
         <div class="venue-body">
           <div class="venue-city-name">Perth</div>
-          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">June 2026 (exact dates TBC)</span></div>
-          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">Venue TBC — part of Synthetic Health Data Week, Perth WA</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Dates</span><span class="venue-row-val">Tuesday 16 &ndash; Wednesday 17 June 2026</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Venue</span><span class="venue-row-val">Venue TBC &mdash; part of Synthetic Health Data Week, Perth WA</span></div>
+          <div class="venue-row"><span class="venue-row-lbl">Hours</span><span class="venue-row-val">9am &ndash; 4pm both days</span></div>
+          <div class="venue-cta">View Details &amp; Register &rarr;</div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
+<!-- ═══ SPEAKER BIO MODAL ═════════════════════════════════════════ -->
+<div class="bio-modal-overlay" id="bioModal" role="dialog" aria-modal="true" aria-labelledby="bioModalName">
+  <div class="bio-modal">
+    <button class="bio-modal-close" id="bioModalClose" aria-label="Close">&times;</button>
+    <div class="bio-modal-header">
+      <div class="bio-modal-avatar">
+        <img id="bioModalImg" src="" alt="" />
+      </div>
+      <div class="bio-modal-meta">
+        <span class="bio-modal-tag" id="bioModalTag"></span>
+        <div class="bio-modal-name" id="bioModalName"></div>
+        <div class="bio-modal-role" id="bioModalRole"></div>
+        <div class="bio-modal-org"  id="bioModalOrg"></div>
+      </div>
+    </div>
+    <div class="bio-modal-body" id="bioModalBody"></div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
 <footer>
   <div class="footer-grid">
     <div>
@@ -1003,10 +1180,18 @@
       </ul>
     </div>
     <div class="footer-col">
+      <h4>Locations</h4>
+      <ul>
+        <li><a href="melbourne.html">Melbourne &mdash; 2&ndash;3 June</a></li>
+        <li><a href="sydney.html">Sydney &mdash; 9&ndash;10 June</a></li>
+        <li><a href="perth.html">Perth &mdash; 16&ndash;17 June</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
       <h4>Contact</h4>
       <ul>
         <li><a href="mailto:info@digitalhealthcrc.com">info@digitalhealthcrc.com</a></li>
-        <li><a href="#">Register Interest</a></li>
+        <li><a href="https://events.humanitix.com/synd-masterclass-sydney" target="_blank" rel="noopener">Register on Humanitix</a></li>
         <li><a href="#">Download Brochure</a></li>
       </ul>
     </div>
@@ -1200,16 +1385,64 @@ ScrollTrigger.create({
     document.getElementById('nav').style.padding =
       self.direction === 1 ? '0.55rem 3rem' : '1rem 3rem';
   },
-});
-
-/* ══ Parallax on photo break ════════════════════════════════════════════════ */
+}/* ══ Parallax on photo break ════════════════════════════════════════════════════════════════════════════════════ */
 gsap.to('.photo-break img', {
   scrollTrigger: { trigger: '.photo-break', start: 'top bottom', end: 'bottom top', scrub: true },
   y: 60, ease: 'none',
 });
+
+/* ══ Speaker Bio Modal ════════════════════════════════════════════════════════════════════════════════════ */
+(function() {
+  const overlay  = document.getElementById('bioModal');
+  const closeBtn = document.getElementById('bioModalClose');
+  const imgEl    = document.getElementById('bioModalImg');
+  const tagEl    = document.getElementById('bioModalTag');
+  const nameEl   = document.getElementById('bioModalName');
+  const roleEl   = document.getElementById('bioModalRole');
+  const orgEl    = document.getElementById('bioModalOrg');
+  const bodyEl   = document.getElementById('bioModalBody');
+
+  function openModal(card) {
+    const bio  = card.getAttribute('data-bio') || '';
+    const img  = card.querySelector('.speaker-card-img img');
+    const tag  = card.querySelector('.speaker-tag');
+    const name = card.querySelector('.speaker-name');
+    const role = card.querySelector('.speaker-role');
+    const org  = card.querySelector('.speaker-org');
+    imgEl.src = img ? img.src : '';
+    imgEl.alt = img ? img.alt : '';
+    tagEl.textContent  = tag  ? tag.textContent  : '';
+    nameEl.textContent = name ? name.textContent : '';
+    roleEl.textContent = role ? role.textContent : '';
+    orgEl.textContent  = org  ? org.textContent  : '';
+    // Convert encoded HTML entities in data-bio to actual HTML
+    const decoded = bio.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&#39;/g,"'");
+    // Wrap paragraphs split by <br><br>
+    const paras = decoded.split('<br><br>');
+    bodyEl.innerHTML = paras.map(p => `<p>${p.replace(/<br>/g,'<br>')}</p>`).join('');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.speaker-card').forEach(card => {
+    card.addEventListener('click', () => openModal(card));
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card); } });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+})();
 </script>
 
-<!-- ═══ LIVING-TABLE TESTIMONIAL BACKGROUND ══════════════════ -->
+<!-- ═══ LIVING-TABLE TESTIMONIAL BACKGROUND ════════════════════════════ -->
 <script>
 (function () {
   'use strict';
