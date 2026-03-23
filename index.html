@@ -1405,6 +1405,24 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     gsap.set(['#hero-eyebrow', '.hero-title .line2', '#hero-meta', '#hero-cta'], { opacity: 1, y: 0 });
   }, 4000);
+  // Fix for anchor links when coming from another page (e.g., venue pages)
+  const handleHash = () => {
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) {
+        // Small delay to allow layout to settle and GSAP to initialize
+        setTimeout(() => {
+          const navHeight = document.getElementById('nav')?.offsetHeight || 80;
+          window.scrollTo({
+            top: target.offsetTop - navHeight,
+            behavior: 'smooth'
+          });
+        }, 150);
+      }
+    }
+  };
+  handleHash();
+  window.addEventListener('hashchange', handleHash);  
 });
 
 /* ══ GSAP Pinned Panels — slide-up on enter ══════════════════════════════════ */
