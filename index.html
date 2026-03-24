@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Synthetic Health Data Masterclass Series 2026</title>
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJJSSD7QSG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GJJSSD7QSG');
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest('a[href*="humanitix.com"]');
+
+      if (!link || typeof gtag !== 'function') {
+        return;
+      }
+
+      gtag('event', 'humanitix_click', {
+        destination_url: link.href,
+        link_text: (link.textContent || '').trim(),
+        page_path: window.location.pathname,
+        transport_type: 'beacon'
+      });
+    });
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
