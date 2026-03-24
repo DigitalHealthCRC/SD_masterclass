@@ -386,8 +386,9 @@
     .quote-attr { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-muted); }
 
     /* ─── VENUE ─────────────────────────────────────────────── */
-    #venue { background: var(--grey); padding: 7rem 3rem; }
-    .venue-wrap { max-width: 1200px; margin: 0 auto; }
+    #venue { background: var(--grey); padding: 7rem 3rem; position: relative; overflow: hidden; }
+    #venue-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; z-index: 0; }
+    .venue-wrap { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
     /* 3-col venue cards — each is a split image+info panel */
     .venue-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
@@ -1148,6 +1149,7 @@
 
 <!-- ═══ VENUE ══════════════════════════════════════════════════ -->
 <section id="venue">
+  <canvas id="venue-canvas"></canvas>
   <div class="venue-wrap">
     <div class="reveal">
       <div class="section-eyebrow">Locations</div>
@@ -1924,5 +1926,183 @@ gsap.to('.photo-break img', {
 
 })();
 </script>
+<script>
+(function venueParticles() {
+  if (typeof THREE === 'undefined') return;
+
+  const canvas = document.getElementById('venue-canvas');
+  const section = document.getElementById('venue');
+  if (!canvas || !section) return;
+
+  const interactive = false;
+  const particleHex = '#f5f4f0';
+  const lineHex = '#f5f4f0';
+  const particleColor = new THREE.Color(particleHex);
+  const lineColor = new THREE.Color(lineHex);
+  const particleOpacityRange = [0.126, 0.224];
+  const lineOpacity = 0.168;
+
+  function getSize() {
+    return { w: section.offsetWidth, h: section.offsetHeight };
+  }
+
+  let { w, h } = getSize();
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+  renderer.setSize(w, h);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 1, 1000);
+  camera.position.z = 10;
+
+  const particleGroup = new THREE.Group();
+  scene.add(particleGroup);
+
+  const particleGeometry = new THREE.CircleGeometry(1, 18);
+  const particleCount = w < 700 ? 90 : w < 1100 ? 144 : 198;
+  const connectionDistance = w < 700 ? 135 : 170;
+  const particles = [];
+
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  for (let i = 0; i < particleCount; i++) {
+    const material = new THREE.MeshBasicMaterial({
+      color: particleColor,
+      transparent: true,
+      opacity: randomBetween(particleOpacityRange[0], particleOpacityRange[1]),
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+
+    const mesh = new THREE.Mesh(particleGeometry, material);
+    mesh.position.set(randomBetween(-w / 2, w / 2), randomBetween(-h / 2, h / 2), 0);
+    const scale = randomBetween(3, 6);
+    mesh.scale.set(scale, scale, 1);
+    mesh.rotation.z = randomBetween(0, Math.PI * 2);
+    particleGroup.add(mesh);
+
+    particles.push({
+      mesh,
+      vx: randomBetween(-0.182, 0.182),
+      vy: randomBetween(-0.104, 0.104),
+      spin: randomBetween(-0.0025, 0.0025),
+      drift: randomBetween(0.52, 1.82),
+      phase: randomBetween(0, Math.PI * 2),
+    });
+  }
+
+  const maxSegments = particleCount * 8;
+  const linePositions = new Float32Array(maxSegments * 6);
+  const lineGeometry = new THREE.BufferGeometry();
+  lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+  lineGeometry.setDrawRange(0, 0);
+
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: lineColor,
+    transparent: true,
+    opacity: lineOpacity,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+
+  const lineMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+  scene.add(lineMesh);
+
+  function updateBounds() {
+    camera.left = -w / 2;
+    camera.right = w / 2;
+    camera.top = h / 2;
+    camera.bottom = -h / 2;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+
+  function updateLines() {
+    let segCount = 0;
+    for (let i = 0; i < particles.length; i++) {
+      const a = particles[i].mesh.position;
+      for (let j = i + 1; j < particles.length; j++) {
+        const b = particles[j].mesh.position;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > connectionDistance) continue;
+        if (segCount >= maxSegments) break;
+
+        const idx = segCount * 6;
+        linePositions[idx] = a.x;
+        linePositions[idx + 1] = a.y;
+        linePositions[idx + 2] = 0;
+        linePositions[idx + 3] = b.x;
+        linePositions[idx + 4] = b.y;
+        linePositions[idx + 5] = 0;
+        segCount++;
+      }
+      if (segCount >= maxSegments) break;
+    }
+
+    lineGeometry.setDrawRange(0, segCount * 2);
+    lineGeometry.attributes.position.needsUpdate = true;
+  }
+
+  const clock = new THREE.Clock();
+  let rafId = 0;
+  let running = false;
+
+  function animate() {
+    if (!running) return;
+    rafId = requestAnimationFrame(animate);
+    const elapsed = clock.getElapsedTime();
+
+    particles.forEach((particle) => {
+      const { mesh } = particle;
+      mesh.position.x += particle.vx + Math.sin(elapsed * particle.drift + particle.phase) * 0.05;
+      mesh.position.y += particle.vy + Math.cos(elapsed * particle.drift * 0.7 + particle.phase) * 0.03;
+      mesh.rotation.z += particle.spin;
+
+      if (mesh.position.x < -w / 2 - 20) mesh.position.x = w / 2 + 20;
+      if (mesh.position.x >  w / 2 + 20) mesh.position.x = -w / 2 - 20;
+      if (mesh.position.y < -h / 2 - 20) mesh.position.y = h / 2 + 20;
+      if (mesh.position.y >  h / 2 + 20) mesh.position.y = -h / 2 - 20;
+    });
+
+    if (interactive) {
+      lineMaterial.opacity = 0.16;
+    }
+
+    updateLines();
+    renderer.render(scene, camera);
+  }
+
+  running = true;
+  clock.start();
+  animate();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting && running) {
+        running = false;
+        cancelAnimationFrame(rafId);
+      } else if (entry.isIntersecting && !running) {
+        running = true;
+        clock.start();
+        animate();
+      }
+    });
+  }, { threshold: 0.05 });
+  observer.observe(section);
+
+  window.addEventListener('resize', () => {
+    const nextSize = getSize();
+    w = nextSize.w;
+    h = nextSize.h;
+    updateBounds();
+  });
+})();
+</script>
 </body>
 </html>
+
