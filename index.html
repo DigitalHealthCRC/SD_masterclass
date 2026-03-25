@@ -358,44 +358,28 @@
     /* ─── REASONS TO ATTEND ─────────────────────────────────── */
     #reasons { background: var(--silver); padding: 7rem 3rem; }
     .reasons-wrap { max-width: 1200px; margin: 0 auto; }
-    /* 2-col layout: checklist left, session-speakers right (like reference) */
-    .reasons-layout {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; align-items: start;
+    .reasons-layout { margin-top: 3rem; }
+    .reasons-list {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem 1.4rem;
     }
-    .reasons-list { display: flex; flex-direction: column; gap: 0; }
     .reason-item {
       display: flex; align-items: flex-start; gap: 0.9rem;
-      padding: 1rem 1.2rem; border-bottom: 1px solid rgba(57,63,77,0.3);
-      transition: background 0.2s;
+      min-height: 100%; padding: 1.3rem 1.4rem;
+      border: 1px solid rgba(57,63,77,0.22); border-radius: 8px;
+      background: rgba(255,255,255,0.38); transition: background 0.2s, border-color 0.2s, transform 0.2s;
     }
-    .reason-item:first-child { border-top: 1px solid rgba(57,63,77,0.3); }
-    .reason-item:hover { background: rgba(57,63,77,0.15); }
+    .reason-item:hover {
+      background: rgba(255,255,255,0.55); border-color: rgba(176,78,24,0.28);
+      transform: translateY(-2px);
+    }
     .reason-check {
       width: 22px; height: 22px; min-width: 22px; margin-top: 0.1rem;
-      border-radius: 50%; background: rgba(254,218,106,0.12);
+      border-radius: 50%; background: rgba(176,78,24,0.16);
       display: flex; align-items: center; justify-content: center;
     }
-    .reason-check svg { width: 11px; height: 11px; stroke: var(--gold); fill: none; stroke-width: 2.5; }
+    .reason-check svg { width: 11px; height: 11px; stroke: #b04e18; fill: none; stroke-width: 2.5; }
     .reason-text { font-size: 0.87rem; line-height: 1.65; color: var(--dark); font-weight: 400; }
-    /* Right panel: session categories with speaker mini-cards */
-    .reasons-sessions { display: flex; flex-direction: column; gap: 1.5rem; }
-    .reason-session-group { }
-    .reason-session-label {
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold-muted); padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(57,63,77,0.4); margin-bottom: 0.8rem;
-    }
-    .reason-speaker-row {
-      display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0;
-      border-bottom: 1px solid rgba(57,63,77,0.2); transition: background 0.2s;
-    }
-    .reason-speaker-row:hover { background: rgba(57,63,77,0.1); padding-left: 0.4rem; }
-       .reason-speaker-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--charcoal); border: 1.5px solid rgba(254,218,106,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .reason-speaker-avatar svg { width: 22px; height: 22px; opacity: 0.3; }
-    .reason-speaker-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .reason-speaker-info .rsi-name { font-size: 0.82rem; font-weight: 600; color: var(--dark); }
-    .reason-speaker-info .rsi-role { font-size: 0.72rem; color: var(--grey); font-weight: 300; }
-    .reason-speaker-info .rsi-org  { font-size: 0.7rem; font-weight: 700; color: var(--dark); }
 
     /* ─── TESTIMONIAL ───────────────────────────────────────── */
     #testimonial { background: #020b16; padding: 0; min-height: 90vh; text-align: center; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
@@ -467,7 +451,8 @@
       #nav { padding: 0.8rem 1.5rem; }
       .nav-links { display: none; }
       #hero, #welcome, #speakers, #sessions, #attend, #reasons, #testimonial, #venue, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
-      .welcome-wrap, .attend-wrap, .reasons-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .welcome-wrap, .attend-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
+      .reasons-list { grid-template-columns: 1fr; }
       .welcome-sidebar { position: static; }
       .speakers-grid { grid-template-columns: repeat(2, 1fr); }
       .sessions-grid { grid-template-columns: 1fr; }
@@ -1091,7 +1076,6 @@ Amir has extensive experience working with population and administrative health 
     </div>
 
     <div class="reasons-layout">
-      <!-- Left: checklist -->
       <div class="reasons-list reveal-left">
         <div class="reason-item">
           <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
@@ -1116,53 +1100,6 @@ Amir has extensive experience working with population and administrative health 
         <div class="reason-item">
           <div class="reason-check"><svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg></div>
           <span class="reason-text">Strengthen cross-sector collaboration and build a shared language across research, policy, clinical, and data communities.</span>
-        </div>
-      </div>
-
-      <!-- Right: session groups with speaker mini-cards -->
-      <div class="reasons-sessions reveal-right">
-        <div class="reason-session-group">
-          <div class="reason-session-label">Foundations &amp; Governance</div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/melanie_haines.jpg" alt="Dr. Melanie Haines" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Dr. Melanie Haines</div><div class="rsi-role">Director of Learning &amp; Workforce Transformation</div><div class="rsi-org">Digital Health CRC</div></div>
-          </div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/peta_collins.jpg" alt="Peta Collins" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Peta Collins</div><div class="rsi-role">Senior Adviser, Collaboration and Community</div><div class="rsi-org">Digital Health CRC</div></div>
-          </div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/keren_pointon.jpg" alt="Keren Pointon" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Keren Pointon</div><div class="rsi-role">Project Manager, SynD Community</div><div class="rsi-org">DHCRC &amp; QDHeC</div></div>
-          </div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/james_boyd.jpg" alt="Prof. James Boyd" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Prof. James Boyd</div><div class="rsi-role">Inaugural Chair of Digital Health &amp; Innovation</div><div class="rsi-org">La Trobe University</div></div>
-          </div>
-        </div>
-
-        <div class="reason-session-group">
-          <div class="reason-session-label">Synthetic Data in Practice</div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/ashley_akbari.png" alt="Prof. Ashley Akbari" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Prof. Ashley Akbari</div><div class="rsi-role">Professor of Population Data Science Research</div><div class="rsi-org">Swansea University / SAIL Databank</div></div>
-          </div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/lewis_hotchkiss.jpg" alt="Lewis Hotchkiss" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Lewis Hotchkiss</div><div class="rsi-role">Senior Research Officer</div><div class="rsi-org">Swansea University</div></div>
-          </div>
-        </div>
-
-        <div class="reason-session-group">
-          <div class="reason-session-label">Federated Analytics &amp; Trusted Research Environments</div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/simon_thompson.jpg" alt="Prof. Simon Thompson" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Prof. Simon Thompson</div><div class="rsi-role">Professor of Health Informatics &amp; CTO of SeRP</div><div class="rsi-org">Swansea University</div></div>
-          </div>
-          <div class="reason-speaker-row">
-            <div class="reason-speaker-avatar"><img src="headshots/chris_orton.png" alt="Chris Orton" /></div>
-            <div class="reason-speaker-info"><div class="rsi-name">Chris Orton</div><div class="rsi-role">Head of Business Development for SeRP and SAIL Databank</div><div class="rsi-org">Swansea University</div></div>
-          </div>
         </div>
       </div>
     </div>
